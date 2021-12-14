@@ -1,5 +1,4 @@
-def call(String agentLabel,body) {
-    
+def call(body) {
     def pipelineParams= [:]
     body.resolveStrategy = Closure.DELEGATE_FIRST
     body.delegate = pipelineParams
@@ -9,17 +8,17 @@ def call(String agentLabel,body) {
         agent none
         stages {
             stage("echo parameters") {
-                agent { label "${agentLabel}" }
+                agent { label "${pipelineParams.agentLabel}" }
                 steps {
                     sh "env | sort"
-                    echo "${agentLabel}"
+                    echo "${pipelineParams.agentLabel}"
                     echo "${pipelineParams.osConfiguration}"
                     echo "${pipelineParams.osConfiguration.OS_VERSION}"
                     echo "${pipelineParams.osConfiguration.DIR_TYPE}"                    
                 }
             }
             stage("Prepare Build Environment") {
-                agent { label "${agentLabel}" }
+                agent { label "${pipelineParams.agentLabel}" }
                 steps {
                     prepareBuildEnvironment()
                     helloWorld(name: "prepareBuildEnvironment")
@@ -27,13 +26,13 @@ def call(String agentLabel,body) {
                 }
             }
             stage("Source Code Checkout") {
-                agent { label "${agentLabel}" }
+                agent { label "${pipelineParams.agentLabel}" }
                 steps {
                     echo 'scc'
                 }
             }
             stage("SonarQube Scan") {
-                agent { label "${agentLabel}" }
+                agent { label "${pipelineParams.agentLabel}" }
                 when {
                     branch 'master'
                 }
@@ -42,50 +41,45 @@ def call(String agentLabel,body) {
                 }
             }
             stage("Build Application") {
-                agent { label "${agentLabel}" }
+                agent { label "${pipelineParams.agentLabel}" }
                 steps {
                     echo 'build'
                 }
             }
             stage("Publish Artifacts") {
-                agent { label "${agentLabel}" }
+                agent { label "${pipelineParams.agentLabel}" }
                 steps {
                     publishArtifacts(name: "publishArtifacts")
                 }
             }
             stage("Deploy Application") {
-                agent { label "${agentLabel}" }
+                agent { label "${pipelineParams.agentLabel}" }
                 steps {
                     deployApplication(name: "deployApplication")
                 }
             }
-            //stage("Long Running Stage") {
-            //    agent { label "${agentLabel}" }
-            //    steps {
-            //        script {
-            //            hook = registerWebhook()
-            //        }
-            //    }
-            //}
-            //stage("Waiting for Webhook") {
-            //    steps {
-            //        echo "Waiting for POST to ${hook.getURL()}"
-            //        script {
-            //            data = waitForWebhook hook
-            //        }
-            //        echo "Webhook called with data: ${data}"
-            //    }
-            //}         
+            stage("Long Running Stage") {
+                agent { label "${pipelineParams.agentLabel}" }
+                steps {
+                    script {
+                        hook = registerWebhook()
+                    }
+                }
+            }
+            stage("Waiting for Webhook") {
+                steps {
+                    echo "Waiting for POST to ${hook.getURL()}"
+                    script {
+                        data = waitForWebhook hook
+                    }
+                    echo "Webhook called with data: ${data}"
+                }
+            }         
         }
         //post {
         //    always {
         //        sendNotification()
         //    }
         //}
-        post {
-            always {
-              addSidebarLink()
-            }
-        }
     }
 }
