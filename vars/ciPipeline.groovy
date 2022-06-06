@@ -26,7 +26,7 @@ void call(List dockerBuildArgs=[], List customParams=[], Map dynamicSteps=[:]) {
     ])
 
     pipeline {
-        agent { label 'ec2-agent' }
+        agent { label 'docker' }
         environment {
             REGISTRY_URL = '354979567826.dkr.ecr.us-east-1.amazonaws.com'
             STATIC_CONTEXT = "/tmp/test_workspace/${JOB_NAME}/${BUILD_NUMBER}"
@@ -51,20 +51,29 @@ void call(List dockerBuildArgs=[], List customParams=[], Map dynamicSteps=[:]) {
             }
             stage('Code Quality') {
                 tools {
-                    jdk 'OpenJDK 11'
+                    jdk 'jdk'
                 }
-                steps {
-                    script {
-                        if (dynamicSteps.preCodeQuality) { dynamicSteps.preCodeQuality().call() }
-                        Boolean codeQualityResult = codeQuality(CELL_FULL_NAME, VERSION, PROPERTIES.sonarPropertiesFile)
-                        if (codeQualityResult != null) {
-                            String qp = env.CHANGE_ID ? "pullRequest=${env.CHANGE_ID}" : "branch=${URLEncoder.encode(env.BRANCH_NAME, 'UTF-8')}"
-                            sonarScanResults = "<https://developer.hqr.hcqis.org/sonar/dashboard?id=${CELL_FULL_NAME}&${qp}|${codeQualityResult ? 'PASSED' : 'FAILED'}>"
-                        }
-                        if (dynamicSteps.postCodeQuality) { dynamicSteps.postCodeQuality().call() }
+                    steps {
+                        script {
+                            if (codeQualityResult != null) {
+                                withSonarQubeEnv(installationName: "sonar") {
+                                sh "mvn clean package"
                     }
+                        }
+                            if (dynamicSteps.postCodeQuality) { dynamicSteps.postCodeQuality().call() }
+                        }
+                 }
+                    // script {
+                    //     if (dynamicSteps.preCodeQuality) { dynamicSteps.preCodeQuality().call() }
+                    //     Boolean codeQualityResult = codeQuality(CELL_FULL_NAME, VERSION, PROPERTIES.sonarPropertiesFile)
+                    //     if (codeQualityResult != null) {
+                    //         // String qp = env.CHANGE_ID ? "pullRequest=${env.CHANGE_ID}" : "branch=${URLEncoder.encode(env.BRANCH_NAME, 'UTF-8')}"
+                    //         // sonarScanResults = "<https://developer.hqr.hcqis.org/sonar/dashboard?id=${CELL_FULL_NAME}&${qp}|${codeQualityResult ? 'PASSED' : 'FAILED'}>"
+                    //     }
+                    //     if (dynamicSteps.postCodeQuality) { dynamicSteps.postCodeQuality().call() }
+                    // }
                 }
-            }
+            
             stage('Build and Stage Application') {
                 steps {
                     script { if (dynamicSteps.preBuildAndStageApplication) { dynamicSteps.preBuildAndStageApplication().call() } }
@@ -117,6 +126,7 @@ void call(List dockerBuildArgs=[], List customParams=[], Map dynamicSteps=[:]) {
             failure {
                 script {
                     if (sonarScanResults != null) {
+                         slackSend channel: '#general', color: 'Good', message: "SonarQube Report: ${sonarScanResults}"
                         buildStatusMessage = "SonarQube Report: ${sonarScanResults}"
                     }
                 }
@@ -132,16 +142,14 @@ void call(List dockerBuildArgs=[], List customParams=[], Map dynamicSteps=[:]) {
                         echo 'An exception occurred while tearing down the workspace:'
                         echo e.getMessage()
                     }
-                    try {
-                        metrics.publishCloudwatchBuildMetrics()
-                    } catch (Exception e) {
-                        echo 'An exception occurred while publishing Cloudwatch Metrics:'
-                        echo e.getMessage()
-                    }
-                    notification.slack(
-                        buildStatusMessage,
-                        PROPERTIES.slack == null ? [] : PROPERTIES.slack as ArrayList<Map>
-                    )
+                    // try {
+                    //     metrics.publishCloudwatchBuildMetrics()
+                    // } catch (Exception e) {
+                    //     echo 'An exception occurred while publishing Cloudwatch Metrics:'
+                    //     echo e.getMessage()
+                    // }(
+
+                    slackSend channel: '#general', color: 'Good', message: "SonarQube Report: ${sonarScanResults}"
                 }
             }
         }

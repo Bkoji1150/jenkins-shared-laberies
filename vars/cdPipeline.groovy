@@ -32,7 +32,7 @@ void call(List terraformVars = [], List customParams = [], List<Map> application
     ])
 
     pipeline {
-        agent { label 'ec2-agent' }
+        agent { label 'docker' }
         environment {
             REGISTRY_URL = '354979567826.dkr.ecr.us-east-1.amazonaws.com'
             STATIC_CONTEXT = "/tmp/test_workspace/${JOB_NAME}/${BUILD_NUMBER}"
@@ -83,7 +83,7 @@ void call(List terraformVars = [], List customParams = [], List<Map> application
 
                     String testsJobName = "${CELL_FULL_NAME}-cuke-tests-automation/${URLEncoder.encode(params.TESTS_BRANCH, 'UTF-8')}"
                     if (ENVIRONMENT.toLowerCase() != 'prod' && jenkins.model.Jenkins.instance.getItemByFullName(testsJobName) != null) {
-                        build job: testsJobName,
+                        build job: testsJobName,  
                         parameters: [string(name: 'ENVIRONMENT', value: params.ENVIRONMENT)]
                     } else {
                         echo 'success'
@@ -93,6 +93,7 @@ void call(List terraformVars = [], List customParams = [], List<Map> application
             failure {
                 script {
                     buildStatusMessage = "Deploy to ${params.ENVIRONMENT} failed!"
+                    slackSend channel: '#general', color: 'Good', message: 'Your build was unseccusful'
                 }
             }
             aborted {
