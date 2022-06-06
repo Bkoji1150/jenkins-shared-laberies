@@ -1,7 +1,3 @@
-vars
-| --- welcomeJob.groovy
-| --- jenkinsForJava.groovy
- 
 // jenkinsForJava.groovy
 def call(String repoUrl) {
   pipeline {
@@ -53,6 +49,9 @@ def call(String repoUrl) {
               }
               }
           }
+
+       }  
+  }       
     post {
     success {
       slackSend botUser: true, channel: 'jenkins_notification', color: 'good',
@@ -69,6 +68,7 @@ def call(String repoUrl) {
     }
 
   }
-       }
-   }
 }
+
+
+

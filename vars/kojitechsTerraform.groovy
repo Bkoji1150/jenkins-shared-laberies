@@ -1,9 +1,4 @@
 // Define variable
-vars
-| --- welcomeJob.groovy
-| --- jenkinsForJava.groovy
- 
-// jenkinsForJava.groovy
 def account = params.ENVIRONMENT
 pipeline {
     agent any
