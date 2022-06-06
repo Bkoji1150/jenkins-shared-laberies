@@ -39,11 +39,6 @@ def call(String repoUrl) {
                    sh "mvn test"
                }
            }
-           stage("Packing Application") {
-               steps {
-                   sh "mvn package -DskipTests"
-               }
-           }
            stage("Static Code analysis With SonarQube") {                                               
             steps {
               withSonarQubeEnv(installationName: 'sonar') {
@@ -58,10 +53,7 @@ def call(String repoUrl) {
               }
               }
           }
-       }
-   }
-   post {
-
+    post {
     success {
       slackSend botUser: true, channel: 'jenkins_notification', color: 'good',
       message: "The pipeline ${currentBuild.fullDisplayName} completed successfully.\nMore info ${env.BUILD_URL}", 
@@ -77,4 +69,6 @@ def call(String repoUrl) {
     }
 
   }
+       }
+   }
 }
