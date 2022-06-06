@@ -1,4 +1,4 @@
 /* groovylint-disable MethodReturnTypeRequired, NoDef */
-def call(string name = 'user') {
+def call(String name = 'User') {
     echo "welcome, ${name}."
 }
