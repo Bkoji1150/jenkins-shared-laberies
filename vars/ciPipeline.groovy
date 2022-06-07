@@ -2,7 +2,6 @@ import java.net.URLEncoder
 
 void call(List dockerBuildArgs=[], List customParams=[], Map dynamicSteps=[:]) {
     String buildStatusMessage = ''
-    String VERSION
     Map PROPERTIES
     String CELL_FULL_NAME
     String BASE_BRANCH = 'master'
@@ -12,7 +11,7 @@ void call(List dockerBuildArgs=[], List customParams=[], Map dynamicSteps=[:]) {
     String sonarScanResults = null
     List defaultParams = [
         ['name': 'PROPERTY_FILE_PATH', 'defaultValue': 'pipeline.json', 'description': 'Path to the pipeline.json file in your repository'],
-        ['name': 'DEPLOY_ENVIRONMENT', 'type': 'choice', 'choices': ['', 'SBX', 'DEV', 'TEST', 'PROD'], 'description': 'Triggers a deploy to the chosen environment. Leave blank to not trigger deploy to an environment. If you choose PROD the CD pipeline will have to be manually approved.'],
+        ['name': 'ENVIRONMENT', 'type': 'choice', 'choices': ['', 'SBX', 'DEV', 'TEST', 'PROD'], 'description': 'Triggers a deploy to the chosen environment. Leave blank to not trigger deploy to an environment. If you choose PROD the CD pipeline will have to be manually approved.'],
         ['name': 'CD_BRANCH', 'defaultValue': 'master', 'description': 'Specify the branch to trigger on the corresponding CD Pipeline. This parameter can be ignored if DEPLOY_ENVIRONMENT is left blank.'],
         ['name': 'TESTS_BRANCH', 'defaultValue': 'master', 'description': 'Specify the branch to trigger on the corresponding Test Pipeline. This parameter can be ignored if a Test Pipeline does not exist.'],
     ]
