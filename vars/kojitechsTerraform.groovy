@@ -7,16 +7,14 @@ void call(List dockerBuildArgs=[], List customParams=[], Map dynamicSteps=[:]) {
     Map PROPERTIES
     String ENVIRONMENT
     List defaultParams = [
-        ['type': 'string', 'name': 'PROPERTY_FILE_PATH', 'defaultValue': 'pipeline.json', 'description': 'Path to the pipeline.json file in your repository'],
+        ['type': 'string', 'name': 'PROPERTY_FILE_PATH', 'defaultValue': 'Jenkinsfile', 'description': 'Path to the pipeline.json file in your repository'],
         ['name': 'ENVIRONMENT', 'type': 'choice', 'choices': ['', 'SBX', 'DEV', 'TEST', 'PROD'], 'description': 'Triggers a deploy to the chosen environment. Leave blank to not trigger deploy to an environment. If you choose PROD the CD pipeline will have to be manually approved.'],
         ['name': 'TESTS_BRANCH', 'defaultValue': 'master', 'description': 'Specify the branch to trigger on the corresponding Test Pipeline. This parameter can be ignored if a Test Pipeline does not exist.'],
     ]
 
     pipeline {
         agent any
-         environment {
-            account = params.ENVIRONMENT
-        }
+       
         tools {
         terraform 'terraform'
         }
