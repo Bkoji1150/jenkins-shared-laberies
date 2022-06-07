@@ -9,7 +9,7 @@ def call(StringGitHubRepository ){
             parameters { 
             choice(name: 'ENVIRONMENT', choices: ['', 'prod', 'sbx', 'dev'], description: "SELECT THE ACCOUNT YOU'D LIKE TO DEPLOY TO.")
             choice(name: 'ACTION', choices: ['', 'plan-apply', 'destroy'], description: 'Select action, BECAREFUL IF YOU SELECT DESTROY TO PROD')
-            string(name: 'GitHubRepository', description: "Please provide the github repository you'd like to deploy to.", trim: true)
+            
             }
             stages{
                 
@@ -22,7 +22,7 @@ def call(StringGitHubRepository ){
 
                 stage('Git checkout') {
                 steps{
-                        git params.GitHubRepository
+                        git "${GitHubRepository}"
                         sh 'pwd' 
                         sh 'ls -l'
                     }
