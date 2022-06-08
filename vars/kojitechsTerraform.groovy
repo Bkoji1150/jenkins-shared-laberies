@@ -1,5 +1,5 @@
 
-def call(String repoUrl) {
+def call(String repoUrl='', List customParams=[]) {
     pipeline {
         agent any
         tools {
@@ -108,7 +108,7 @@ def call(String repoUrl) {
         }
         aborted {
         slackSend botUser: true, channel: 'jenkins_notification', color: 'hex',
-        message: "Your Terraform ${params.ACTION} with ${currentBuild.fullDisplayName} got aborted.\n${env.BUILD_URL}", 
+        message: "Your Terraform ${params.ACTION} with ${currentBuild.fullDisplayName} got aborted.\nMore Info ${env.BUILD_URL}", 
         teamDomain: 'slack', tokenCredentialId: 'slack'
         }
         cleanup {
