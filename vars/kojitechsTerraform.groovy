@@ -1,5 +1,6 @@
 
-def call(String repoUrl='', List customParams=[]) {
+def call(String repoUrl='', List customParams=[],  Map dynamicSteps=[:]) {
+    
     pipeline {
         agent any
         tools {
