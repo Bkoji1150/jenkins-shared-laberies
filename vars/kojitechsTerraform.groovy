@@ -9,14 +9,7 @@ def call(String repoUrl='', List customParams=[],  Map dynamicSteps=[:]) {
             choice(name: 'ENVIRONMENT', choices: ['', 'prod', 'sbx', 'dev'], description: "SELECT THE ACCOUNT YOU'D LIKE TO DEPLOY TO.")
             choice(name: 'ACTION', choices: ['', 'plan-apply', 'destroy'], description: 'Select action, BECAREFUL IF YOU SELECT DESTROY TO PROD')
         }
-        stages{
-            stage('Build Workspace') {
-                steps{
-                    script {
-                        workspace.build()
-                    }
-                }
-            }    
+        stages{    
             stage('Git checkout') {
                 steps{
                     git branch: 'master',
