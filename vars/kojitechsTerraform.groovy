@@ -1,4 +1,4 @@
-def call(String repoUrl='', List customParams=[],  Map dynamicSteps=[:]) {
+def call() {
       
     pipeline {
             agent any
@@ -12,8 +12,7 @@ def call(String repoUrl='', List customParams=[],  Map dynamicSteps=[:]) {
         stages{    
             stage('Git checkout') {
                 steps{
-                    git branch: 'master',
-                        url: "${repoUrl}"
+                    checkout scm
                         sh """
                             pwd
                             ls -l

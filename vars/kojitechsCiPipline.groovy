@@ -35,32 +35,36 @@ def call() {
               }
             }
           }
-          stage ("Waiting for Quality Gate Result") {
-              steps {
-                  timeout(time: 3, unit: 'MINUTES') {
-                  waitForQualityGate abortPipeline: true 
-              }
-              }
-          }
-
-       }  
+          timeout(time: 3, unit: 'MINUTES') {
+                script {
+                    def qg = waitForQualityGate()
+                    if (qg.status != 'OK') {
+                        error "Pipeline aborted due to a quality gate failure: ${qg.status}"
+                    }
+                }
+            }
+       } 
+      post {
+        success {
+            slackSend botUser: true, channel: 'jenkins_notification', color: 'good',
+            message: " with ${currentBuild.fullDisplayName} completed successfully.\nMore info ${env.BUILD_URL}\nLogin to ${params.ENVIRONMENT} and confirm.", 
+            teamDomain: 'slack', tokenCredentialId: 'slack'
+        }
+        failure {
+            slackSend botUser: true, channel: 'jenkins_notification', color: 'danger',
+            message: "${currentBuild.fullDisplayName} got failed.", 
+            teamDomain: 'slack', tokenCredentialId: 'slack'
+        }
+        aborted {
+            slackSend botUser: true, channel: 'jenkins_notification', color: 'hex',
+            message: "Pipeline aborted due to a quality gate failure: ${qg.status} ${currentBuild.fullDisplayName} got aborted.\nMore Info ${env.BUILD_URL}", 
+            teamDomain: 'slack', tokenCredentialId: 'slack'
+        }
+        cleanup {
+            cleanWs()
+        }
+        } 
   }       
-    post {
-    success {
-      slackSend botUser: true, channel: 'jenkins_notification', color: 'good',
-      message: "The pipeline ${currentBuild.fullDisplayName} completed successfully.\nMore info ${env.BUILD_URL}", 
-      teamDomain: 'slack', tokenCredentialId: 'slack'
-    }
-    failure {
-      slackSend botUser: true, channel: 'jenkins_notification', color: 'danger',
-      message: "The pipeline ${currentBuild.fullDisplayName} completed with failure.\nError in ${env.BUILD_URL}", 
-      teamDomain: 'slack', tokenCredentialId: 'slack'
-    }
-    cleanup {
-     cleanWs()
-    }
-
-  }
 }
 
 
