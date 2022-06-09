@@ -6,8 +6,8 @@ def call() {
             terraform 'terraform'
         }
         parameters { 
-            choice(name: 'ENVIRONMENT', 'defaultValue': 'sbx', choices: ['sbx', 'prod', 'sbx', 'dev'], description: "SELECT THE ACCOUNT YOU'D LIKE TO DEPLOY TO.")
-            choice(name: 'ACTION', 'defaultValue': 'apply', choices: ['apply', 'apply', 'destroy'], description: 'Select action, BECAREFUL IF YOU SELECT DESTROY TO PROD')
+            choice(name: 'ENVIRONMENT', choices: ['sbx', 'prod', 'sbx', 'dev'], description: "SELECT THE ACCOUNT YOU'D LIKE TO DEPLOY TO.")
+            choice(name: 'ACTION', choices: ['apply', 'apply', 'destroy'], description: 'Select action, BECAREFUL IF YOU SELECT DESTROY TO PROD')
         }
         stages{    
             stage('Git checkout') {
