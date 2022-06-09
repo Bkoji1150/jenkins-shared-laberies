@@ -1,5 +1,5 @@
 // jenkinsForJava.groovy
-def call(String repoUrl) {
+def call() {
   pipeline {
        agent any
        tools {
@@ -13,28 +13,21 @@ def call(String repoUrl) {
                    sh "java -version"
                }
            }
-           stage('clean workspaces -----------') { 
-            steps {
-              cleanWs()
-              sh 'env'
-            } //steps
-        }  //stage
            stage("Checkout Code") {
                steps {
-                   git branch: 'master',
-                       url: "${repoUrl}"
-               }
+                checkout scm
+            }
            }
-           stage("Cleaning workspace") {
-               steps {
-                   sh "mvn clean package -DskipTests=true"
-               }
-           }
-           stage("Running Testcase") {
-              steps {
-                   sh "mvn test"
-               }
-           }
+           stage('Compile') {
+            steps {
+                sh 'mvn clean package -DskipTests=true'
+            }
+        }
+             stage('Unit Tests Execution') {
+            steps {
+                sh 'mvn surefire:test'
+            }
+        }
            stage("Static Code analysis With SonarQube") {                                               
             steps {
               withSonarQubeEnv(installationName: 'sonar') {
