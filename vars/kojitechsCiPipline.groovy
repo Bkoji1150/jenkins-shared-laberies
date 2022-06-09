@@ -35,24 +35,23 @@ def call() {
               }
             }
           }
-          stage ("Waiting for Quality Gate Result") {
-              steps {
-                  timeout(time: 3, unit: 'MINUTES') {
-                    def qg = waitForQualityGate()
-                    if (qg.status != 'OK') {
-                        error "Pipeline aborted due to a quality gate failure: ${qg.status}"
-                    }
-              }
-              }
-          }
-          // timeout(time: 3, unit: 'MINUTES') {
-          //       script {
+          // stage ("Waiting for Quality Gate Result") {
+          //     steps {
+          //         timeout(time: 3, unit: 'MINUTES') {
           //           def qg = waitForQualityGate()
           //           if (qg.status != 'OK') {
           //               error "Pipeline aborted due to a quality gate failure: ${qg.status}"
           //           }
-          //       }
-          //   }
+          //     }
+          //     }
+          // }
+          stage ("Waiting for Quality Gate Result") {
+              steps {
+                  timeout(time: 3, unit: 'MINUTES') {
+                  waitForQualityGate abortPipeline: true 
+              }
+              }
+          }
        } 
       post {
         success {
@@ -67,7 +66,7 @@ def call() {
         }
         aborted {
             slackSend botUser: true, channel: 'jenkins_notification', color: 'hex',
-            message: "Pipeline aborted due to a quality gate failure: ${qg.status} ${currentBuild.fullDisplayName} got aborted.\nMore Info ${env.BUILD_URL}", 
+            message: "Pipeline aborted due to a quality gate failure ${currentBuild.fullDisplayName} got aborted.\nMore Info ${env.BUILD_URL}", 
             teamDomain: 'slack', tokenCredentialId: 'slack'
         }
         cleanup {
