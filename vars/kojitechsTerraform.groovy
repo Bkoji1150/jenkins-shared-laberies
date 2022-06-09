@@ -8,7 +8,6 @@ def call(String repoUrl='', List customParams=[],  Map dynamicSteps=[:]) {
         parameters { 
             choice(name: 'ENVIRONMENT', choices: ['', 'prod', 'sbx', 'dev'], description: "SELECT THE ACCOUNT YOU'D LIKE TO DEPLOY TO.")
             choice(name: 'ACTION', choices: ['', 'plan-apply', 'destroy'], description: 'Select action, BECAREFUL IF YOU SELECT DESTROY TO PROD')
-            String(name: 'BRANCH', 'defaultValue': 'master', 'description': 'Specify the branch to trigger on the corresponding Test Pipeline. This parameter can be ignored if a Test Pipeline does not exist.')
         }
         stages{
             stage('Build Workspace') {
@@ -20,7 +19,7 @@ def call(String repoUrl='', List customParams=[],  Map dynamicSteps=[:]) {
             }    
             stage('Git checkout') {
                 steps{
-                    git branch: params.BRANCH,
+                    git branch: 'master',
                         url: "${repoUrl}"
                         sh """
                             pwd
