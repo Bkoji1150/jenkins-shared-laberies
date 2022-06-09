@@ -14,7 +14,7 @@ def call(String repoUrl='', List customParams=[],  Map dynamicSteps=[:]) {
             stage('Build Workspace') {
                 steps{
                     script {
-                            workspace.build()
+                        workspace.build()
                     }
                 }
             }    
@@ -125,4 +125,3 @@ def call(String repoUrl='', List customParams=[],  Map dynamicSteps=[:]) {
         }
     }
 }    
-}
