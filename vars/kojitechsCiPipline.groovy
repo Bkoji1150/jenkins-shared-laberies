@@ -20,7 +20,7 @@ def call() {
            }
            stage('Compile') {
             steps {
-                sh 'mvn clean package -DskipTests=true'
+                sh 'mvn clean'
             }
         }
              stage('Unit Tests Execution') {
