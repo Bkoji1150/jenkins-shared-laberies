@@ -1,31 +1,31 @@
 def call(String repoUrl='', List customParams=[],  Map dynamicSteps=[:]) {
       
     pipeline {
-        agent any
+            agent any
         tools {
-        terraform 'terraform'
+            terraform 'terraform'
         }
         parameters { 
-        choice(name: 'ENVIRONMENT', choices: ['', 'prod', 'sbx', 'dev'], description: "SELECT THE ACCOUNT YOU'D LIKE TO DEPLOY TO.")
-        choice(name: 'ACTION', choices: ['', 'plan-apply', 'destroy'], description: 'Select action, BECAREFUL IF YOU SELECT DESTROY TO PROD')
-        ['name': 'BRANCH', 'defaultValue': 'master', 'description': 'Specify the branch to trigger on the corresponding Test Pipeline. This parameter can be ignored if a Test Pipeline does not exist.']
+            choice(name: 'ENVIRONMENT', choices: ['', 'prod', 'sbx', 'dev'], description: "SELECT THE ACCOUNT YOU'D LIKE TO DEPLOY TO.")
+            choice(name: 'ACTION', choices: ['', 'plan-apply', 'destroy'], description: 'Select action, BECAREFUL IF YOU SELECT DESTROY TO PROD')
+            ['name': 'BRANCH', 'defaultValue': 'master', 'description': 'Specify the branch to trigger on the corresponding Test Pipeline. This parameter can be ignored if a Test Pipeline does not exist.']
         }
         stages{
             stage('Build Workspace') {
-            steps{
-                  script {
-                        workspace.build()
+                steps{
+                    script {
+                            workspace.build()
+                    }
                 }
-            }
             stage('Git checkout') {
-            steps{
-                   git branch: params.BRANCH,
-                       url: "${repoUrl}"
-                    sh """
-                        pwd
-                        ls -l
-                    """
-                }
+                steps{
+                    git branch: params.BRANCH,
+                        url: "${repoUrl}"
+                        sh """
+                            pwd
+                            ls -l
+                        """
+                    }
             }
             stage('TerraformInit'){
                 steps {
@@ -39,18 +39,18 @@ def call(String repoUrl='', List customParams=[],  Map dynamicSteps=[:]) {
             }
         stage('Create Terraform workspace'){
                 steps {
-                        script {
-                            try {
-                                sh "terraform workspace select ${params.ENVIRONMENT}"
-                            } catch (Exception e) {
-                                echo "Error occurred: ${e.getMessage()}"
-                                sh """
-                                    terraform workspace new ${params.ENVIRONMENT}
-                                    terraform workspace select ${params.ENVIRONMENT}
-                                """
-                            }
-                
+                    script {
+                        try {
+                            sh "terraform workspace select ${params.ENVIRONMENT}"
+                        } catch (Exception e) {
+                            echo "Error occurred: ${e.getMessage()}"
+                            sh """
+                                terraform workspace new ${params.ENVIRONMENT}
+                                terraform workspace select ${params.ENVIRONMENT}
+                            """
                         }
+        
+                    }
             }
         }
             stage('Terraform plan'){
@@ -103,26 +103,25 @@ def call(String repoUrl='', List customParams=[],  Map dynamicSteps=[:]) {
             }  //stage
     }
     post {
-
         success {
-        slackSend botUser: true, channel: 'jenkins_notification', color: 'good',
-        message: "${params.ACTION} with ${currentBuild.fullDisplayName} completed successfully.\nMore info ${env.BUILD_URL}\nLogin to ${params.ENVIRONMENT} and confirm.", 
-        teamDomain: 'slack', tokenCredentialId: 'slack'
+            slackSend botUser: true, channel: 'jenkins_notification', color: 'good',
+            message: "${params.ACTION} with ${currentBuild.fullDisplayName} completed successfully.\nMore info ${env.BUILD_URL}\nLogin to ${params.ENVIRONMENT} and confirm.", 
+            teamDomain: 'slack', tokenCredentialId: 'slack'
         }
         failure {
-        slackSend botUser: true, channel: 'jenkins_notification', color: 'danger',
-        message: "Your Terraform ${params.ACTION} with ${currentBuild.fullDisplayName} got failed.", 
-        teamDomain: 'slack', tokenCredentialId: 'slack'
+            slackSend botUser: true, channel: 'jenkins_notification', color: 'danger',
+            message: "Your Terraform ${params.ACTION} with ${currentBuild.fullDisplayName} got failed.", 
+            teamDomain: 'slack', tokenCredentialId: 'slack'
         }
         aborted {
-        slackSend botUser: true, channel: 'jenkins_notification', color: 'hex',
-        message: "Your Terraform ${params.ACTION} with ${currentBuild.fullDisplayName} got aborted.\nMore Info ${env.BUILD_URL}", 
-        teamDomain: 'slack', tokenCredentialId: 'slack'
+            slackSend botUser: true, channel: 'jenkins_notification', color: 'hex',
+            message: "Your Terraform ${params.ACTION} with ${currentBuild.fullDisplayName} got aborted.\nMore Info ${env.BUILD_URL}", 
+            teamDomain: 'slack', tokenCredentialId: 'slack'
         }
         cleanup {
-        cleanWs()
+            cleanWs()
         }
-
-    }
+        }
     }
 }    
+}
