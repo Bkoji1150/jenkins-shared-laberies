@@ -1,4 +1,35 @@
+   import java.net.URLEncoder
 
+void call(List dockerBuildArgs=[], List customParams=[], Map dynamicSteps=[:]) {
+    String buildStatusMessage = ''
+    Map PROPERTIES
+    String CELL_FULL_NAME
+    String BASE_BRANCH = 'master'
+    String COMPONENT_TYPE
+    String DEPLOY_ENVIRONMENT
+    Map userDockerBuildArgs
+    String sonarScanResults = null
+    List defaultParams = [
+        ['name': 'PROPERTY_FILE_PATH', 'defaultValue': 'pipeline.json', 'description': 'Path to the pipeline.json file in your repository'],
+        ['name': 'ENVIRONMENT', 'type': 'choice', 'choices': ['', 'SBX', 'DEV', 'TEST', 'PROD'], 'description': 'Triggers a deploy to the chosen environment. Leave blank to not trigger deploy to an environment. If you choose PROD the CD pipeline will have to be manually approved.'],
+        ['name': 'CD_BRANCH', 'defaultValue': 'master', 'description': 'Specify the branch to trigger on the corresponding CD Pipeline. This parameter can be ignored if DEPLOY_ENVIRONMENT is left blank.'],
+        ['name': 'TESTS_BRANCH', 'defaultValue': 'master', 'description': 'Specify the branch to trigger on the corresponding Test Pipeline. This parameter can be ignored if a Test Pipeline does not exist.'],
+    ]
+
+    properties([
+        parameters ([
+            // customParams _must_ come first to override the defaultParams
+            utils.buildParams(customParams + defaultParams),
+            utils.buildParams(dockerBuildArgs, 'docker'),
+        ].collectMany { l -> l })
+    ])
+
+    pipeline {
+        agent { label 'ec2-agent' }
+        environment {
+            REGISTRY_URL = '354979567826.dkr.ecr.us-east-1.amazonaws.com'
+            STATIC_CONTEXT = "/tmp/test_workspace/${JOB_NAME}/${BUILD_NUMBER}"
+        }
 def call(String repoUrl='', List customParams=[],  Map dynamicSteps=[:]) {
     
     pipeline {
@@ -37,7 +68,7 @@ def call(String repoUrl='', List customParams=[],  Map dynamicSteps=[:]) {
                             try {
                                 sh "terraform workspace select ${params.ENVIRONMENT}"
                             } catch (Exception e) {
-                                echo "Error occurred: ${e}"
+                                echo "Error occurred: ${e.getMessage()}"
                                 sh """
                                     terraform workspace new ${params.ENVIRONMENT}
                                     terraform workspace select ${params.ENVIRONMENT}
@@ -53,7 +84,8 @@ def call(String repoUrl='', List customParams=[],  Map dynamicSteps=[:]) {
                             try{
                                 sh "terraform plan -var-file='${params.ENVIRONMENT}.tfvars' -refresh=true -lock=false -no-color -out='${params.ENVIRONMENT}.plan'"
                             } catch (Exception e){
-                                echo "Error occurred: ${e}"
+                                echo "Error occurred while running terraform plan"
+                                echo e.getMessage()
                                 sh "terraform plan -refresh=true -lock=false -no-color -out='${params.ENVIRONMENT}.plan'"
                             }
                         }
@@ -79,7 +111,8 @@ def call(String repoUrl='', List customParams=[],  Map dynamicSteps=[:]) {
                                     terraform destroy -var-file=${params.ENVIRONMENT}.tfvars -no-color -auto-approve
                                 """
                             } catch (Exception e){
-                                echo "Error occurred: ${e}"
+                                echo "Error occurred"
+                                echo e.getMessage()
                                 sh "terraform destroy -no-color -auto-approve"
                             }
                         }
