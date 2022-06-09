@@ -17,6 +17,7 @@ def call(String repoUrl='', List customParams=[],  Map dynamicSteps=[:]) {
                             workspace.build()
                     }
                 }
+            }    
             stage('Git checkout') {
                 steps{
                     git branch: params.BRANCH,
