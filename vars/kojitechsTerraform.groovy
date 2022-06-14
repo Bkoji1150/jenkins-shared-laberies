@@ -102,7 +102,7 @@ def call() {
         }
         failure {
             slackSend botUser: true, channel: 'jenkins_notification', color: 'danger',
-            message: "Your Terraform ${params.ACTION} with ${currentBuild.fullDisplayName} got failed.", 
+            message: "Your Terraform ${params.ACTION} with ${currentBuild.fullDisplayName} got failed.\nPlease go to ${env.BUILD_URL} and verify the build", 
             teamDomain: 'slack', tokenCredentialId: 'slack'
         }
         aborted {
