@@ -42,6 +42,14 @@ def call() {
               }
               }
           }
+        //      stage ("Pushing .war file to artifactory") {
+        //       steps {
+        //           timeout(time: 3, unit: 'MINUTES') {
+        //           waitForQualityGate abortPipeline: true 
+        //       }
+        //       }
+        //   }
+
        } 
       post {
         success {
