@@ -97,7 +97,7 @@ def call() {
     post {
         success {
             slackSend botUser: true, channel: 'jenkins_notification', color: 'good',
-            message: "${params.ACTION} with ${currentBuild.fullDisplayName} completed successfully.\nMore info ${env.BUILD_URL}\nLogin to ${params.ENVIRONMENT} and confirm.", 
+            message: "${params.ACTION} with ${currentBuild.fullDisplayName} completed successfully.\nMore info ${env.BUILD_URL}\nLogin to ${params.ENVIRONMENT} Account and confirm.", 
             teamDomain: 'slack', tokenCredentialId: 'slack'
         }
         failure {
