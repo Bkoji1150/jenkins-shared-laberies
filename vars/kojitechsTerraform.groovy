@@ -49,6 +49,7 @@ def call() {
                 steps {
                         script {
                             try{
+                                bash "export TF_LOG="DEBUG"  
                                 sh "terraform plan -var-file='${params.ENVIRONMENT}.tfvars' -refresh=true -lock=false -no-color -out='${params.ENVIRONMENT}.plan'"
                             } catch (Exception e){
                                 echo "Error occurred while running"
