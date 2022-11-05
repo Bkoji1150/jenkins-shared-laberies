@@ -19,21 +19,17 @@ def call() {
                         """
                     }
             }
-            stage('Assume Role') {
-            steps {
-                withAWS(roleAccount:'735972722491', role:'Role_For-S3_Creation') {
-                    sh 'aws s3 ls'
-                }
-            }
-        }  
+  
             stage('TerraformInit'){
                 steps {
-                        sh """
+                      withAWS(roleAccount:'735972722491', role:'Role_For-S3_Creation') {           
+                          sh """
                             rm -rf .terraform 
                             terraform init -upgrade=true
                             echo \$PWD
                             whoami
                         """
+                   }
                 }
             }
         stage('Create Terraform workspace'){
