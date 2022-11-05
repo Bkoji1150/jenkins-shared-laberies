@@ -19,6 +19,13 @@ def call() {
                         """
                     }
             }
+            stage('Assume Role') {
+            steps {
+                withAWS(roleAccount:'735972722491', role:'Role_For-S3_Creation') {
+                    sh 'aws s3 ls'
+                }
+            }
+        }  
             stage('TerraformInit'){
                 steps {
                         sh """
