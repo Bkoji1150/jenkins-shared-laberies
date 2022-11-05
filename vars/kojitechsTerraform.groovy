@@ -34,6 +34,7 @@ def call() {
             }
         stage('Create Terraform workspace'){
                 steps {
+                   withAWS(roleAccount:'735972722491', role:'Role_For-S3_Creation') {  
                     script {
                         try {
                             sh "terraform workspace select ${params.ENVIRONMENT}"
@@ -47,10 +48,12 @@ def call() {
         
                     }
             }
+                }          
         }
             stage('Terraform plan'){
                 steps {
                         script {
+                           withAWS(roleAccount:'735972722491', role:'Role_For-S3_Creation') {     
                             try{
                                 sh "terraform plan -var-file='${params.ENVIRONMENT}.tfvars' -refresh=true -lock=false -no-color -out='${params.ENVIRONMENT}.plan'"
                             } catch (Exception e){
@@ -59,7 +62,7 @@ def call() {
                                 sh "terraform plan -refresh=true -lock=false -no-color -out='${params.ENVIRONMENT}.plan'"
                             }
                         }
-                
+                     }
                 }
             }
             stage('Confirm your action') {
@@ -73,6 +76,7 @@ def call() {
                 steps {
                 sh 'echo "continue"'
                 script{  
+                    withAWS(roleAccount:'735972722491', role:'Role_For-S3_Creation') {       
                     if (params.ACTION == "destroy"){
                         script {
                             try {
@@ -92,7 +96,7 @@ def call() {
                                 terraform apply ${params.ENVIRONMENT}.plan
                             """ 
                     }  // if
-
+                    }
                 }
                 } //steps
             }  //stage
