@@ -8,8 +8,9 @@ pipeline {
       jdk 'jdk'
     }
     parameters { 
-        string(name: 'REPO_NAME', description: 'PROVIDER THE NAME OF DOCKERHUB IMAGE', defaultValue: 'kojitechs-kart',  trim: true)
-        string(name: 'REPO_URL', description: 'PROVIDER THE NAME OF DOCKERHUB/ECR URL', defaultValue: '674293488770.dkr.ecr.us-east-1.amazonaws.com',  trim: true)
+        string(name: 'REPO_NAME', description: 'PROVIDE THE NAME OF DOCKERHUB IMAGE', defaultValue: 'kojitechs-kart')
+        string(name: 'REPOSITORY_ID', description: 'PROVIDE THE NAME OF REPOSITORY_ID', defaultValue: '674293488770')
+        string(name: 'REPO_URL', description: 'PROVIDE THE NAME OF ECR URL', defaultValue: '674293488770.dkr.ecr.us-east-1.amazonaws.com')
         string(name: 'AWS_REGION', description: 'AWS REGION', defaultValue: 'us-east-1')
         choice(name: 'ACTION', choices: ['RELEASE', 'RELEASE', 'NO'], description: 'Select action, BECAREFUL IF YOU SELECT DESTROY TO PROD')
     }
@@ -59,7 +60,7 @@ pipeline {
                     try {
                         sh"""
                             pwd && ls -al
-                            docker build --compress -t kojitechs-kart .
+                            docker build --compress -t ${params.REPO_NAME} .
                         """ 
                     }catch (Exception e) {
                         echo 'An exception occurred while Building image'
@@ -71,7 +72,7 @@ pipeline {
         stage('Confirm your action') {
                 steps {
                     script {
-                        timeout(time: 1, unit: 'MINUTES') {
+                        timeout(time: 2, unit: 'MINUTES') {
                         def userInput = input(id: 'confirm', message: params.ACTION + '?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Release image version?', name: 'confirm'] ])
                     }
                 }
@@ -81,13 +82,13 @@ pipeline {
             steps {
                 sh 'echo "continue"'
                 script{  
-                    withAWS(roleAccount:'674293488770', role:'Role_For-S3_Creation') {
+                    withAWS(roleAccount:${params.REPOSITORY_ID}, role:'Role_For-S3_Creation') {
                     if (params.ACTION == "RELEASE"){
                         script {
                             try {
                                 sh """
                                     aws ecr get-login-password  --region ${params.AWS_REGION} | docker login --username AWS --password-stdin ${params.REPO_URL}                 
-                                    docker tag kojitechs-kart:latest ${params.REPO_URL}/${params.REPO_NAME}:${tag}
+                                    docker tag ${params.REPO_NAME}:latest ${params.REPO_URL}/${params.REPO_NAME}:${tag}
                                     docker push ${params.REPO_URL}/${params.REPO_NAME}:${tag}
                                     docker tag ${params.REPO_URL}/${params.REPO_NAME}:${tag} ${params.REPO_URL}/${params.REPO_NAME}:latest
                                     docker push ${params.REPO_URL}/${params.REPO_NAME}:latest
