@@ -68,8 +68,10 @@ def call() {
             stage('Confirm your action') {
                 steps {
                     script {
+                        timeout(time: 3, unit: 'MINUTES') {
                         def userInput = input(id: 'confirm', message: params.ACTION + '?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Apply terraform', name: 'confirm'] ])
                     }
+                    }  
                 }
             }
         stage('Terraform apply or destroy ----------------') {
