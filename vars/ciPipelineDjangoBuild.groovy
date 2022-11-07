@@ -2,8 +2,13 @@ def call() {
    pipeline {
 
   agent any
+
+    tools {
+      maven 'mvn'
+      jdk 'jdk'
+    }
+
     parameters { 
-    
         string(name: 'REPO_NAME', description: 'PROVIDER THE NAME OF DOCKERHUB IMAGE', defaultValue: 'kojitechs-kart',  trim: true)
         string(name: 'REPO_URL', description: 'PROVIDER THE NAME OF DOCKERHUB/ECR URL', defaultValue: '674293488770.dkr.ecr.us-east-1.amazonaws.com',  trim: true)
         string(name: 'AWS_REGION', description: 'AWS REGION', defaultValue: 'us-east-1')
