@@ -12,6 +12,7 @@ def call() {
         string(name: 'REPO_NAME', description: 'PROVIDER THE NAME OF DOCKERHUB IMAGE', defaultValue: 'kojitechs-kart',  trim: true)
         string(name: 'REPO_URL', description: 'PROVIDER THE NAME OF DOCKERHUB/ECR URL', defaultValue: '674293488770.dkr.ecr.us-east-1.amazonaws.com',  trim: true)
         string(name: 'AWS_REGION', description: 'AWS REGION', defaultValue: 'us-east-1')
+        choice(name: 'ACTION', choices: ['RELEASE', 'RELEASE', 'NO'], description: 'Select action, BECAREFUL IF YOU SELECT DESTROY TO PROD')
     }
     environment {
         tag = sh(returnStdout: true, script: "git rev-parse --short=10 HEAD").trim()
@@ -86,7 +87,7 @@ def call() {
                 sh 'echo "continue"'
                 script{  
                     withAWS(roleAccount:'674293488770', role:'Role_For-S3_Creation') {
-                    if (params.ACTION == "release"){
+                    if (params.ACTION == "RELEASE"){
                         script {
                             try {
                                 sh """
