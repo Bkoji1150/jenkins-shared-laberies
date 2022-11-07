@@ -82,7 +82,7 @@ pipeline {
             steps {
                 sh 'echo "continue"'
                 script{  
-                    withAWS(roleAccount:${params.REPOSITORY_ID}, role:'Role_For-S3_Creation') {
+                    withAWS(roleAccount: params.REPOSITORY_ID, role:'Role_For-S3_Creation') {
                     if (params.ACTION == "RELEASE"){
                         script {
                             try {
