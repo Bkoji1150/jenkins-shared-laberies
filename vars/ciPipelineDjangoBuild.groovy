@@ -19,10 +19,10 @@ def call() {
                 steps {
                     script {
                         workspace.build()
-                        if (fileExists(params.PROPERTY_FILE_PATH)) {
-                            PROPERTIES = readJSON file: params.PROPERTY_FILE_PATH
+                        if (fileExists(params.REPO_NAME)) {
+                            echo 'Created worksace'
                         } else {
-                            error("Properties file (${params.PROPERTY_FILE_PATH}) does not exist!")
+                            error("Properties file (${params.REPO_NAME}) does not exist!")
                         }
                     }
                 }
