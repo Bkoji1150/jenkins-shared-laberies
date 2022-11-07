@@ -140,7 +140,7 @@ pipeline {
         }
         failure {
             slackSend botUser: true, channel: 'jenkins_notification', color: 'danger',
-            message: "${currentBuild.fullDisplayName} got failed.", 
+            message: "${currentBuild.fullDisplayName} failed Due to CodeQuality Test or other reasons.", 
             teamDomain: 'slack', tokenCredentialId: 'slack'
         }
         aborted {
