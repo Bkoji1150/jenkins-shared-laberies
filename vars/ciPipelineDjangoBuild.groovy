@@ -2,12 +2,8 @@ def call() {
    pipeline {
 
   agent any
-
-    tools {
-      maven 'mvn'
-      jdk 'jdk'
-    }
     parameters { 
+    
         string(name: 'REPO_NAME', description: 'PROVIDER THE NAME OF DOCKERHUB IMAGE', defaultValue: 'kojitechs-kart',  trim: true)
         string(name: 'REPO_URL', description: 'PROVIDER THE NAME OF DOCKERHUB/ECR URL', defaultValue: '674293488770.dkr.ecr.us-east-1.amazonaws.com',  trim: true)
         string(name: 'AWS_REGION', description: 'AWS REGION', defaultValue: 'us-east-1')
@@ -15,9 +11,22 @@ def call() {
     }
     environment {
         tag = sh(returnStdout: true, script: "git rev-parse --short=10 HEAD").trim()
-
+        REGISTRY_URL = '674293488770.dkr.ecr.us-east-1.amazonaws.com'
+        STATIC_CONTEXT = "/tmp/test_workspace/${JOB_NAME}/${BUILD_NUMBER}"
     }
-    stages {      
+    stages {    
+        stage('Build Workspace') {
+                steps {
+                    script {
+                        workspace.build()
+                        if (fileExists(params.PROPERTY_FILE_PATH)) {
+                            PROPERTIES = readJSON file: params.PROPERTY_FILE_PATH
+                        } else {
+                            error("Properties file (${params.PROPERTY_FILE_PATH}) does not exist!")
+                        }
+                    }
+                }
+            }  
         stage('Docker Build Image') {
             steps {
                 script {         
@@ -78,7 +87,7 @@ def call() {
                             try {
                                 sh """
                                     aws ecr get-login-password  --region ${params.AWS_REGION} | docker login --username AWS --password-stdin ${params.REPO_URL}                 
-                                    docker tag kojitechs-kart:latest ${params.REPO_URL}/${params.REPO_NAME}:${tag}
+                                    docker tag kojitechs-kart:latest ${params.REPO_URL}/${env.REGISTRY_URL}:${tag}
                                     docker push ${params.REPO_URL}/${params.REPO_NAME}:${tag}
                                     docker tag ${params.REPO_URL}/${params.REPO_NAME}:${tag} ${params.REPO_URL}/${params.REPO_NAME}:latest
                                     docker push ${params.REPO_URL}/${params.REPO_NAME}:latest
