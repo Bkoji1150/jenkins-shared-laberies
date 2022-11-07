@@ -32,21 +32,6 @@ pipeline {
                 }  
             }
         }  
-        stage('Docker Build Image') {
-            steps {
-                script {         
-                    try {
-                        sh"""
-                            pwd && ls -al
-                            docker build --compress -t kojitechs-kart .
-                        """ 
-                    }catch (Exception e) {
-                        echo 'An exception occurred while Building image'
-                        echo e.getMessage()
-                    }
-                }
-            }
-        }
         stage('Testing Docker Image') {
             steps {
                 echo "Appending database secrets to file"
@@ -83,8 +68,22 @@ pipeline {
                         } 
                     }
                 }
-            }  
-        }
+            }
+        stage('Docker Build Image') {
+            steps {
+                script {         
+                    try {
+                        sh"""
+                            pwd && ls -al
+                            docker build --compress -t kojitechs-kart .
+                        """ 
+                    }catch (Exception e) {
+                        echo 'An exception occurred while Building image'
+                        echo e.getMessage()
+                    }
+                }
+            }
+        }     
         stage('Confirm your action') {
                 steps {
                     script {
