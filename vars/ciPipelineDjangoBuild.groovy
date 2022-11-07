@@ -7,7 +7,6 @@ pipeline {
       maven 'mvn'
       jdk 'jdk'
     }
-
     parameters { 
         string(name: 'REPO_NAME', description: 'PROVIDER THE NAME OF DOCKERHUB IMAGE', defaultValue: 'kojitechs-kart',  trim: true)
         string(name: 'REPO_URL', description: 'PROVIDER THE NAME OF DOCKERHUB/ECR URL', defaultValue: '674293488770.dkr.ecr.us-east-1.amazonaws.com',  trim: true)
@@ -73,7 +72,7 @@ pipeline {
                 steps {
                     script {
                         timeout(time: 1, unit: 'MINUTES') {
-                        def userInput = input(id: 'confirm', message: params.ACTION + '?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Release image version?', name: 'confirm'] ])
+                        def userInput = input(id: 'confirm', message: 'Do Wish to deploy new' params.ACTION + '?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Release image version?', name: 'confirm'] ])
                     }
                 }
             }  
