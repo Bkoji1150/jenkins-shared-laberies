@@ -24,8 +24,7 @@ def call() {
                         echo 'Creating worksace'
                         workspace.build() 
                     }
-                }
-            }  
+                }  
         stage('Docker Build Image') {
             steps {
                 script {         
@@ -142,5 +141,5 @@ def call() {
             cleanWs()
         }
     } 
-}       
-   
+    }       
+}   
