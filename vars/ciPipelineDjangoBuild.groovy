@@ -120,7 +120,7 @@ def call() {
             script {
                 try {
                     sh'''
-                    docker rm -f $(docker ps -aq)
+                    docker rm -f $(docker ps -aq) && docker ps -a || True 
                     docker rmi $(docker images -q)
                     '''
                 } catch (Exception e) {
