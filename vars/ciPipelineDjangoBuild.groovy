@@ -46,9 +46,9 @@ pipeline {
                         REDIS_HOST=redis_db
                         REDIS_PORT=6379 
                     EOF'''
-                    sh"""python -m venv venv && source venv/bin/activate
+                    sh"""python -m venv venv >/dev/null 2>&1 && source venv/bin/activate
                     docker-compose run --rm kojitechs-kart sh -c 'python manage.py wait_for_db && python manage.py test'
-                    deactivate
+                    deactivate >/dev/null 2>&1
                     """
                     echo 'QUALITY TEST RESULY SEEMS OK, kojitechs-kart has zero error'  
                     }
@@ -117,7 +117,6 @@ pipeline {
                 try {
                     sh'''
                     docker rm -f $(docker ps -aq) && docker ps -a 
-                    docker rmi $(docker images -q)
                     '''
                 } catch (Exception e) {
                     echo 'An exception occurred while removing Unused and Dangling images'
