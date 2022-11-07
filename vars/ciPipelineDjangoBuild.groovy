@@ -54,16 +54,6 @@ pipeline {
                     }
                 }
             }
-        stage('Fail Build if QUALITY TEST failed') {
-                steps {
-                    script {
-                        if (currentBuild.getPreviousBuild().result != 'SUCCESS') {
-                            error "Pipeline aborted due to CodeQuality failure: ${currentBuild.getPreviousBuild().result}"
-                            echo "failed" 
-                        } 
-                    }
-                }
-            }
         stage('Docker Build Image') {
             steps {
                 script {         
