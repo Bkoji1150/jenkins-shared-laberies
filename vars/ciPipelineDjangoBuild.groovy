@@ -12,7 +12,6 @@ def call() {
         string(name: 'REPO_NAME', description: 'PROVIDER THE NAME OF DOCKERHUB IMAGE', defaultValue: 'kojitechs-kart',  trim: true)
         string(name: 'REPO_URL', description: 'PROVIDER THE NAME OF DOCKERHUB/ECR URL', defaultValue: '674293488770.dkr.ecr.us-east-1.amazonaws.com',  trim: true)
         string(name: 'AWS_REGION', description: 'AWS REGION', defaultValue: 'us-east-1')
-        choice(name: 'ACTION', choices: ['release', 'release', 'do-not-deploy'], description: 'Select action, would you like to release a new version?')
     }
     environment {
         tag = sh(returnStdout: true, script: "git rev-parse --short=10 HEAD").trim()
@@ -131,7 +130,7 @@ def call() {
         }
         success {
             slackSend botUser: true, channel: 'jenkins_notification', color: 'good',
-            message: " with ${currentBuild.fullDisplayName} completed successfully.\nMore info ${env.BUILD_URL}\nLogin to ${params.ENVIRONMENT} and confirm.", 
+            message: "${currentBuild.fullDisplayName} completed successfully.\nNew image release has beeing pushed to ECR ${tag}", 
             teamDomain: 'slack', tokenCredentialId: 'slack'
         }
         failure {
@@ -141,7 +140,7 @@ def call() {
         }
         aborted {
             slackSend botUser: true, channel: 'jenkins_notification', color: 'hex',
-            message: "Pipeline aborted due to a quality gate failure ${currentBuild.fullDisplayName} got aborted.\nMore Info ${env.BUILD_URL}", 
+            message: "Pipeline aborted due to a quality gate failure ${currentBuild.fullDisplayName} got aborted.", 
             teamDomain: 'slack', tokenCredentialId: 'slack'
         }
         cleanup {
