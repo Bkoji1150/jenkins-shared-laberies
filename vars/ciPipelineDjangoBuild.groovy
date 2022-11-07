@@ -65,17 +65,25 @@ pipeline {
                         sh"""python -m venv venv && source venv/bin/activate
                         docker-compose run --rm kojitechs-kart sh -c 'python manage.py wait_for_db && python manage.py test'
                         deactivate
-                        """  
-                        if (currentBuild.currentResult != 'SUCCESS') {
-                            error "Pipeline aborted due to CodeQuality failure: ${currentBuild.currentResult}"
-                            echo "failed" 
-                        } 
+                        """
+                        echo 'QUALITY TEST RESULY SEEMS OK, kojitechs-kart has zero error'  
                     }catch (Exception e) {
                         echo 'An exception occurred while Testing image'
                         echo e.getMessage()
                 }
                 }
             }
+        }
+        stage('Fail Build if QUALITY TEST failed') {
+                steps {
+                    script {
+                        if (currentBuild.getPreviousBuild().result != 'SUCCESS') {
+                            error "Pipeline aborted due to CodeQuality failure: ${currentBuild.getPreviousBuild().result}"
+                            echo "failed" 
+                        } 
+                    }
+                }
+            }  
         }
         stage('Confirm your action') {
                 steps {
