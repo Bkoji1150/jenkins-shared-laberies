@@ -36,29 +36,24 @@ pipeline {
             steps {
                 echo "Appending database secrets to file"
                 script {         
-                    try {
-                        sh '''#!/bin/bash 
-                            cat << EOF >> web/.env
-                            POSTGRES_DB=dockerdc
-                            POSTGRES_PASSWORD=mysecretpassword
-                            POSTGRES_USER=myuser
-                            POSTGRES_HOST=postgres_db
-                            POSTGRES_PORT=5433
-                            REDIS_HOST=redis_db
-                            REDIS_PORT=6379 
-                        EOF'''
-                        sh"""python -m venv venv && source venv/bin/activate
-                        docker-compose run --rm kojitechs-kart sh -c 'python manage.py wait_for_db && python manage.py test'
-                        deactivate
-                        """
-                        echo 'QUALITY TEST RESULY SEEMS OK, kojitechs-kart has zero error'  
-                    }catch (Exception e) {
-                        echo 'An exception occurred while Testing image'
-                        echo e.getMessage()
-                }
+                    sh '''#!/bin/bash 
+                        cat << EOF >> web/.env
+                        POSTGRES_DB=dockerdc
+                        POSTGRES_PASSWORD=mysecretpassword
+                        POSTGRES_USER=myuser
+                        POSTGRES_HOST=postgres_db
+                        POSTGRES_PORT=5433
+                        REDIS_HOST=redis_db
+                        REDIS_PORT=6379 
+                    EOF'''
+                    sh"""python -m venv venv && source venv/bin/activate
+                    docker-compose run --rm kojitechs-kart sh -c 'python manage.py wait_for_db && python manage.py test'
+                    deactivate
+                    """
+                    echo 'QUALITY TEST RESULY SEEMS OK, kojitechs-kart has zero error'  
+                    }
                 }
             }
-        }
         stage('Fail Build if QUALITY TEST failed') {
                 steps {
                     script {
@@ -125,7 +120,7 @@ pipeline {
                 }
                     } 
             }
-        }  
+    }    
     post {
         always {
             script {
