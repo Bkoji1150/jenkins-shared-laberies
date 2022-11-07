@@ -66,7 +66,7 @@ pipeline {
                         docker-compose run --rm kojitechs-kart sh -c 'python manage.py wait_for_db && python manage.py test'
                         deactivate
                         """  
-                        if (${currentBuild.currentResult} != 'OK') {
+                        if (currentBuild.currentResult != 'SUCCESS') {
                             error "Pipeline aborted due to CodeQuality failure: ${currentBuild.currentResult}"
                             echo "failed" 
                         } 
@@ -113,12 +113,12 @@ pipeline {
                                 echo  "llego" + params.ACTION
                                 image release would not be deployed!"
                             """ 
-                    }  // if
+                    } 
                     }
                 }
-                    } //steps
+                    } 
             }
-        }  //stage
+        }  
     post {
         always {
             script {
