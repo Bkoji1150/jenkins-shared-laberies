@@ -23,12 +23,8 @@ def call() {
         stage('Build Workspace') {
                 steps {
                     script {
-                        workspace.build()
-                        if (fileExists(params.REPO_NAME)) {
-                            echo 'Created worksace'
-                        } else {
-                            error("Properties file (${params.REPO_NAME}) does not exist!")
-                        }
+                        echo 'Created worksace'
+                        workspace.build() 
                     }
                 }
             }  
