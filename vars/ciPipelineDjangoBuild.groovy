@@ -46,7 +46,7 @@ pipeline {
                         REDIS_HOST=redis_db
                         REDIS_PORT=6379 
                     EOF'''
-                    sh"""python -m venv venv >/dev/null 2>&1 && source venv/bin/activate
+                    sh"""python -m venv venv  && source venv/bin/activate >/dev/null 2>&1
                     docker-compose run --rm kojitechs-kart sh -c 'python manage.py wait_for_db && python manage.py test'
                     deactivate >/dev/null 2>&1
                     """
