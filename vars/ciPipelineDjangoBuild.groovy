@@ -66,7 +66,7 @@ pipeline {
                         docker-compose run --rm kojitechs-kart sh -c 'python manage.py wait_for_db && python manage.py test'
                         deactivate
                         """  
-                        if (${currentBuild.currentResult} != 'ok') {
+                        if (${currentBuild.currentResult} != 'OK') {
                             error "Pipeline aborted due to CodeQuality failure: ${currentBuild.currentResult}"
                             echo "failed" 
                         } 
@@ -124,11 +124,11 @@ pipeline {
             script {
                 try {
                     sh'''
-                    docker rm -f $(docker ps -aq) && docker ps -a || True 
+                    docker rm -f $(docker ps -aq) && docker ps -a 
                     docker rmi $(docker images -q)
                     '''
                 } catch (Exception e) {
-                    echo 'An exception occurred while pushing image to docker hub'
+                    echo 'An exception occurred while removing Unused and Dangling images'
                     echo e.getMessage()
                 }    
             }    
