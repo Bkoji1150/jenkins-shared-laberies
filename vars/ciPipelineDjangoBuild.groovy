@@ -19,12 +19,19 @@ def call() {
     }
     stages {    
         stage('Build Workspace') {
-                steps {
-                    script
+            steps {
+                script {
+                    try{
                         echo 'Creating worksace'
                         workspace.build() 
-                    }
+                    } catch (Exception e) {
+                    echo 'An exception occurred creating workspace:'
+                    echo e.getMessage()
+                }
+                        
                 }  
+            }
+        }  
         stage('Docker Build Image') {
             steps {
                 script {         
