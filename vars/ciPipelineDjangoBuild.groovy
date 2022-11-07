@@ -1,6 +1,6 @@
 def call() {
-
-   pipeline {
+    
+pipeline {
   agent any
 
     tools {
@@ -66,6 +66,10 @@ def call() {
                         docker-compose run --rm kojitechs-kart sh -c 'python manage.py wait_for_db && python manage.py test'
                         deactivate
                         """  
+                        if (${currentBuild.currentResult} != 'ok') {
+                            error "Pipeline aborted due to CodeQuality failure: ${currentBuild.currentResult}"
+                            echo "failed" 
+                        } 
                     }catch (Exception e) {
                         echo 'An exception occurred while Testing image'
                         echo e.getMessage()
