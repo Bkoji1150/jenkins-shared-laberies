@@ -72,7 +72,7 @@ pipeline {
                 steps {
                     script {
                         timeout(time: 1, unit: 'MINUTES') {
-                        def userInput = input(id: 'confirm', message: 'Do Wish to deploy new' params.ACTION + '?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Release image version?', name: 'confirm'] ])
+                        def userInput = input(id: 'confirm', message: params.ACTION + '?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Release image version?', name: 'confirm'] ])
                     }
                 }
             }  
