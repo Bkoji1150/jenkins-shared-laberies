@@ -37,7 +37,7 @@ pipeline {
                 echo "Appending database secrets to file"
                 script {         
                     sh '''#!/bin/bash 
-                        cat << EOF >> web/.env
+                        cat << EOF >> app/.env
                         POSTGRES_DB=dockerdc
                         POSTGRES_PASSWORD=mysecretpassword
                         POSTGRES_USER=myuser
