@@ -2,11 +2,7 @@ def call() {
     
 pipeline {
   agent any
-
-    tools {
-      maven 'mvn'
-      jdk 'jdk'
-    }
+  
     parameters { 
         string(name: 'REPO_NAME', description: 'PROVIDE THE NAME OF DOCKERHUB IMAGE', defaultValue: 'kojitechs-kart')
         string(name: 'REPOSITORY_ID', description: 'PROVIDE THE NAME OF REPOSITORY_ID', defaultValue: '674293488770')
