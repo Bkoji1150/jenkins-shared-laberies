@@ -28,28 +28,28 @@ pipeline {
                 }  
             }
         }  
-        stage('Testing Docker Image') {
-            steps {
-                echo "Appending database secrets to file"
-                script {         
-                    sh '''#!/bin/bash 
-                        cat << EOF >> app/.env
-                        POSTGRES_DB=dockerdc
-                        POSTGRES_PASSWORD=mysecretpassword
-                        POSTGRES_USER=myuser
-                        POSTGRES_HOST=postgres_db
-                        POSTGRES_PORT=5433
-                        REDIS_HOST=redis_db
-                        REDIS_PORT=6379 
-                    EOF'''
-                    sh"""python -m venv venv  && source venv/bin/activate && pip install -r requirements.txt >/dev/null 2>&1
-                    docker-compose run --rm kojitechs-kart sh -c 'python manage.py wait_for_db && python manage.py test'
-                    deactivate >/dev/null 2>&1
-                    """
-                    echo 'QUALITY TEST RESULY SEEMS OK, kojitechs-kart has zero error'  
-                    }
-                }
-            }
+//         stage('Testing Docker Image') {
+//             steps {
+//                 echo "Appending database secrets to file"
+//                 script {         
+//                     sh '''#!/bin/bash 
+//                         cat << EOF >> app/.env
+//                         POSTGRES_DB=dockerdc
+//                         POSTGRES_PASSWORD=mysecretpassword
+//                         POSTGRES_USER=myuser
+//                         POSTGRES_HOST=postgres_db
+//                         POSTGRES_PORT=5433
+//                         REDIS_HOST=redis_db
+//                         REDIS_PORT=6379 
+//                     EOF'''
+//                     sh"""python -m venv venv  && source venv/bin/activate && pip install -r requirements.txt >/dev/null 2>&1
+//                     docker-compose run --rm kojitechs-kart sh -c 'python manage.py wait_for_db && python manage.py test'
+//                     deactivate >/dev/null 2>&1
+//                     """
+//                     echo 'QUALITY TEST RESULY SEEMS OK, kojitechs-kart has zero error'  
+//                     }
+//                 }
+//             }
         stage('Docker Build Image') {
             steps {
                 script {         
