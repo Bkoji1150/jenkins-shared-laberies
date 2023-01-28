@@ -107,17 +107,17 @@ def call() {
         success {
             slackSend botUser: true, channel: 'jenkins_notification', color: 'good',
             message: "${params.ACTION} with ${currentBuild.fullDisplayName} completed successfully.\nMore info ${env.BUILD_URL}\nLogin to ${params.ENVIRONMENT} Account and confirm.", 
-            teamDomain: 'slack', tokenCredentialId: 'slack-token'
+            teamDomain: 'slack', tokenCredentialId: 'slack'
         }
         failure {
             slackSend botUser: true, channel: 'jenkins_notification', color: 'danger',
             message: "Your Terraform ${params.ACTION} with ${currentBuild.fullDisplayName} got failed.\nPlease go to ${env.BUILD_URL} and verify the build", 
-            teamDomain: 'slack', tokenCredentialId: 'slack-token'
+            teamDomain: 'slack', tokenCredentialId: 'slack'
         }
         aborted {
             slackSend botUser: true, channel: 'jenkins_notification', color: 'hex',
             message: "Your Terraform ${params.ACTION} with ${currentBuild.fullDisplayName} got aborted.\nMore Info ${env.BUILD_URL}", 
-            teamDomain: 'slack', tokenCredentialId: 'slack-token'
+            teamDomain: 'slack', tokenCredentialId: 'slack'
         }
         cleanup {
             cleanWs()
