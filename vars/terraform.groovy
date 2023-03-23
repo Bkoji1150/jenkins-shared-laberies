@@ -1,23 +1,28 @@
 String init(String credentialsId, String workspace) {
     String terraformVersion = ''
-    String stateBucket = sh(
         script: """
-            docker run -v \$(pwd)/main.tf:/main.tf tmccombs/hcl2json /main.tf /dev/stdout | \\
-            jq -r '.terraform.backend.s3.bucket'
-        """,
-        returnStdout: true
-    ).trim()
+            aws ec2 describe-instances 
+        """
+    // String stateBucket = sh(
+    //     script: """
+    //         aws ec2 describe-instances 
+    //     """,
+    //     returnStdout: true
+    // ).trim()
 
     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'hqr-prod-aws-access-key']]) {
-        terraformVersion = sh(
-            script: "aws s3 cp s3://${stateBucket}/env:/${workspace}/terraform.tfstate - | jq -r '.terraform_version'",
-            returnStdout: true
-        ).trim()
+        // terraformVersion = sh(
+        //     script: "aws s3 cp s3://${stateBucket}/env:/${workspace}/terraform.tfstate - | jq -r '.terraform_version'",
+        //     returnStdout: true
+        // ).trim()
 
-        setTerraformVersion(terraformVersion)
+        // setTerraformVersion(terraformVersion)
 
         sshagent (credentials: ["${credentialsId}"]) {
-            sh 'terraform get -update'
+            sh """
+            terraform init
+            terraform get -update
+            """
         }
 
         String validateTerraformOutput = sh(
@@ -38,7 +43,7 @@ String init(String credentialsId, String workspace) {
 
             switch (diagnostics[0] as String) {
                 case upgradeErrors:
-                    terraformVersion = '0.13.5'
+                    terraformVersion = '1.3.1'
                     echo "Error with Terraform validation, trying Terraform v${terraformVersion}..."
                     setTerraformVersion(terraformVersion)
                     break
