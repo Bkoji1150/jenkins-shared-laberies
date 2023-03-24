@@ -23,12 +23,12 @@ def call() {
             stage('TerraformInit'){
                 steps {   
                      script { 
-                          String validateTerraformOutput = sh(
+                        String validateTerraformOutput = sh(
                             script: 'terraform validate -json || true',
                             returnStdout: true
                         ).trim()
+                        def validateTerraform = readJSON text: validateTerraformOutput
                      }   
-                    def validateTerraform = readJSON text: validateTerraformOutput
                         // sh """
                         //     rm -rf .terraform 
                         //     terraform init -upgrade=true
