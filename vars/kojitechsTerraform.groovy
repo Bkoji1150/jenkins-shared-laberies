@@ -27,7 +27,7 @@ def call() {
                             script: 'terraform validate -json || true',
                             returnStdout: true
                         ).trim()
-                        def validateTerraform = readJson text: validateTerraformOutput
+                        def validateTerraform = readJSON text: validateTerraformOutput
                      }   
                         // sh """
                         //     rm -rf .terraform 
