@@ -1,7 +1,7 @@
 def call() {
-      
+
     pipeline {
-            agent any
+        agent any
         tools {
             terraform 'terraform'
         }
@@ -12,12 +12,12 @@ def call() {
         stages{    
             stage('terraform init') {
                 steps{
-                    checkout scm
-                        sh """
-                            terraform init
-                            terraform get -update
-                        """
-                    }
+                checkout scm
+                    sh """
+                        terraform init
+                        terraform get -update
+                    """
+                }
             }
             stage('Terraform validation') {
                 steps {   
@@ -31,16 +31,12 @@ def call() {
                             List<String> diagnostics = validateTerraform.diagnostics*.summary.unique()
                             List<String> upgradeErrors = ['Custom variable validation is experimental']
                             List<String> passErrors = ['Could not load plugin']
-
                             if (diagnostics.size > 1) {
                                 error("Error with Terraform configuration:\n${diagnostics.join('\n')}")
                             }
-
                             switch (diagnostics[0] as String) {
                                 case upgradeErrors:
-                                    terraformVersion = '0.13.5'
                                     echo "Error with Terraform validation, trying Terraform v${terraformVersion}..."
-                                    setTerraformVersion(terraformVersion)
                                     break
                                 case passErrors:
                                     echo 'Error with Terraform validation acceptable for Terraform >v0.13. Continuing...'
@@ -91,31 +87,39 @@ def call() {
                 }
             }
         stage('Terraform apply or destroy ----------------') {
-                steps {
-                sh 'echo "continue"'
-                script{    
-                    if (params.ACTION == "destroy"){
-                        script {
-                            try {
-                                sh """
-                                    echo "llego" + params.ACTION
-                                    terraform destroy -var-file=${params.ENVIRONMENT}.tfvars -no-color -auto-approve
-                                """
-                            } catch (Exception e){
-                                echo "Error occurred: ${e}"
-                                sh "terraform destroy -no-color -auto-approve"
-                            }
+            steps {
+            sh 'echo "continue"'
+            script{    
+                if (params.ACTION == "destroy"){
+                    script {
+                        try {
+                            sh """
+                                echo "llego" + params.ACTION
+                                terraform destroy -var-file=${params.ENVIRONMENT}.tfvars -no-color -auto-approve
+                            """
+                        } catch (Exception e){
+                            echo "Error occurred: ${e}"
+                            sh "terraform destroy -no-color -auto-approve"
                         }
+                }
                         
                 }else {
-                            sh"""
-                                echo  "llego" + params.ACTION
-                                terraform apply ${params.ENVIRONMENT}.plan
-                            """ 
-                    }  // if
+                    sh"""
+                        echo  "llego" + params.ACTION
+                        terraform apply ${params.ENVIRONMENT}.plan
+                    """ 
+                }  // if
+            }
+        } //steps
+        }
+        stage('ansible-test') {
+                steps{
+                checkout scm
+                    sh """
+                        ansible --version
+                    """
                 }
-                } //steps
-            }  //stage
+            }
     }
     post {
         success {
