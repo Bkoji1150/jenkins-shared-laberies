@@ -13,8 +13,6 @@ def call() {
             stage('terraform init') {
                 steps{
                     checkout scm
-
-                    String terraformVersion = '' 
                         sh """
                             terraform init
                             terraform get -update
