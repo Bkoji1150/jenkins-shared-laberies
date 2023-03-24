@@ -114,10 +114,7 @@ def call() {
         }
         stage('ansible-test') {
                 steps{
-                checkout scm
-                    sh """
-                        ansible --version
-                    """
+                    ansiblePlaybook become: true, installation: 'ansible', playbook: '', sudo: true
                 }
             }
     }
