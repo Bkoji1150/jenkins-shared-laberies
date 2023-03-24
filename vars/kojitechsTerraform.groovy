@@ -72,40 +72,19 @@ def call() {
             }
                 }          
         }
-        stage('Terraform Plan'){
-            steps {
-                script {
-                    String plan(Map variables = [:], String terraformVersion, Boolean useDefault = false) {
-                        String variablesCmd = variables.collect { varKey, varVal -> "-var '${varKey}=${varVal}'" }.join(' ')
-                        String requiredVersion = terraformVersion
-
-                        if (variablesCmd.length() > 0) {
-                            variablesCmd = "\\\n${variablesCmd}"
+            stage('Terraform plan'){
+                steps {
+                    script {    
+                            try{
+                                sh "terraform plan  -var-file=\$(terraform workspace show).tfvars  -refresh=true -lock=false -no-color -out='${params.ENVIRONMENT}.plan'"
+                            } catch (Exception e){
+                                echo "Error occurred while running"
+                                echo e.getMessage()
+                                sh "terraform plan -refresh=true -lock=false -no-color -out='${params.ENVIRONMENT}.plan'"
                         }
-
-                        String planTextOut = 'plan-text.out'
-                        String terraformPlan = """
-                            terraform plan \\
-                                -var-file=${useDefault ? 'terraform.tfvars' : '$(terraform workspace show).tfvars'} \\
-                                -out \$(terraform workspace show).plan ${variablesCmd}
-                        """
                     }
                 }
-            }          
-        }
-            // stage('Terraform plan'){
-            //     steps {
-            //         script {    
-            //                 try{
-            //                     sh "terraform plan -var-file='${params.ENVIRONMENT}.tfvars' -refresh=true -lock=false -no-color -out='${params.ENVIRONMENT}.plan'"
-            //                 } catch (Exception e){
-            //                     echo "Error occurred while running"
-            //                     echo e.getMessage()
-            //                     sh "terraform plan -refresh=true -lock=false -no-color -out='${params.ENVIRONMENT}.plan'"
-            //             }
-            //         }
-            //     }
-            // }
+            }
             stage('Confirm your action') {
                 steps {
                     script {
