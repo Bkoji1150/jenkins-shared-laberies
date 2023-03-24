@@ -73,8 +73,8 @@ def call() {
                 }          
         }
         stage('Terraform Plan'){
-                steps {
-                    script {
+            steps {
+                script {
                     String plan(Map variables = [:], String terraformVersion, Boolean useDefault = false) {
                         String variablesCmd = variables.collect { varKey, varVal -> "-var '${varKey}=${varVal}'" }.join(' ')
                         String requiredVersion = terraformVersion
@@ -89,9 +89,9 @@ def call() {
                                 -var-file=${useDefault ? 'terraform.tfvars' : '$(terraform workspace show).tfvars'} \\
                                 -out \$(terraform workspace show).plan ${variablesCmd}
                         """
-                        }
                     }
-                }          
+                }
+            }          
         }
             // stage('Terraform plan'){
             //     steps {
