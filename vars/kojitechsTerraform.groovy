@@ -21,20 +21,17 @@ def call() {
             }
   
             stage('TerraformInit'){
-                steps {
-                      withAWS(roleAccount:'735972722491', role:'Role_For-S3_Creation') {           
-                          sh """
+                steps {      
+                        sh """
                             rm -rf .terraform 
                             terraform init -upgrade=true
                             echo \$PWD
                             whoami
                         """
-                   }
                 }
             }
         stage('Create Terraform workspace'){
                 steps {
-                   withAWS(roleAccount:'735972722491', role:'Role_For-S3_Creation') {  
                     script {
                         try {
                             sh "terraform workspace select ${params.ENVIRONMENT}"
@@ -45,15 +42,12 @@ def call() {
                                 terraform workspace select ${params.ENVIRONMENT}
                             """
                         }
-        
-                    }
             }
                 }          
         }
             stage('Terraform plan'){
                 steps {
-                        script {
-                           withAWS(roleAccount:'735972722491', role:'Role_For-S3_Creation') {     
+                        script {    
                             try{
                                 sh "terraform plan -var-file='${params.ENVIRONMENT}.tfvars' -refresh=true -lock=false -no-color -out='${params.ENVIRONMENT}.plan'"
                             } catch (Exception e){
@@ -61,7 +55,6 @@ def call() {
                                 echo e.getMessage()
                                 sh "terraform plan -refresh=true -lock=false -no-color -out='${params.ENVIRONMENT}.plan'"
                             }
-                        }
                      }
                 }
             }
@@ -77,8 +70,7 @@ def call() {
         stage('Terraform apply or destroy ----------------') {
                 steps {
                 sh 'echo "continue"'
-                script{  
-                    withAWS(roleAccount:'735972722491', role:'Role_For-S3_Creation') {       
+                script{    
                     if (params.ACTION == "destroy"){
                         script {
                             try {
@@ -98,7 +90,6 @@ def call() {
                                 terraform apply ${params.ENVIRONMENT}.plan
                             """ 
                     }  // if
-                    }
                 }
                 } //steps
             }  //stage
