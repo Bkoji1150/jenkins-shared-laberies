@@ -13,16 +13,17 @@ def call() {
             stage('terraform init') {
                 steps{
                     checkout scm
+
+                    String terraformVersion = '' 
                         sh """
                             terraform init
                             terraform get -update
                         """
                     }
             }
-  
             stage('Terraform validation') {
                 steps {   
-                     script { 
+                     script {
                         String validateTerraformOutput = sh(
                             script: 'terraform validate -json || true',
                             returnStdout: true
@@ -52,12 +53,8 @@ def call() {
                             }
                         }   
                     }
-                        // sh """
-                        //     rm -rf .terraform 
-                        //     terraform init -upgrade=true
-                        //     echo \$PWD
-                        //     whoami
-                        // """
+                    return terraformVersion
+
                 }
             }
         stage('Create Terraform workspace'){
@@ -75,19 +72,40 @@ def call() {
             }
                 }          
         }
-            stage('Terraform plan'){
+        stage('Terraform Plan'){
                 steps {
-                        script {    
-                            try{
-                                sh "terraform plan -var-file='${params.ENVIRONMENT}.tfvars' -refresh=true -lock=false -no-color -out='${params.ENVIRONMENT}.plan'"
-                            } catch (Exception e){
-                                echo "Error occurred while running"
-                                echo e.getMessage()
-                                sh "terraform plan -refresh=true -lock=false -no-color -out='${params.ENVIRONMENT}.plan'"
-                            }
-                     }
-                }
-            }
+                    script {
+                    String plan(Map variables = [:], String terraformVersion, Boolean useDefault = false) {
+                        String variablesCmd = variables.collect { varKey, varVal -> "-var '${varKey}=${varVal}'" }.join(' ')
+                        String requiredVersion = terraformVersion
+
+                        if (variablesCmd.length() > 0) {
+                            variablesCmd = "\\\n${variablesCmd}"
+                        }
+
+                        String planTextOut = 'plan-text.out'
+                        String terraformPlan = """
+                            terraform plan \\
+                                -var-file=${useDefault ? 'terraform.tfvars' : '$(terraform workspace show).tfvars'} \\
+                                -out \$(terraform workspace show).plan ${variablesCmd}
+                        """
+                        }
+                    }
+                }          
+        }
+            // stage('Terraform plan'){
+            //     steps {
+            //         script {    
+            //                 try{
+            //                     sh "terraform plan -var-file='${params.ENVIRONMENT}.tfvars' -refresh=true -lock=false -no-color -out='${params.ENVIRONMENT}.plan'"
+            //                 } catch (Exception e){
+            //                     echo "Error occurred while running"
+            //                     echo e.getMessage()
+            //                     sh "terraform plan -refresh=true -lock=false -no-color -out='${params.ENVIRONMENT}.plan'"
+            //             }
+            //         }
+            //     }
+            // }
             stage('Confirm your action') {
                 steps {
                     script {
