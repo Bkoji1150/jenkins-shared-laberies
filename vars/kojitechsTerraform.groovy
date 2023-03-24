@@ -28,30 +28,30 @@ def call() {
                             returnStdout: true
                         ).trim()
                         def validateTerraform = readJSON text: validateTerraformOutput
-                    }
-                    if (!validateTerraform.valid) {
-                        List<String> diagnostics = validateTerraform.diagnostics*.summary.unique()
-                        List<String> upgradeErrors = ['Custom variable validation is experimental']
-                        List<String> passErrors = ['Could not load plugin']
+                        if (!validateTerraform.valid) {
+                            List<String> diagnostics = validateTerraform.diagnostics*.summary.unique()
+                            List<String> upgradeErrors = ['Custom variable validation is experimental']
+                            List<String> passErrors = ['Could not load plugin']
 
-                        if (diagnostics.size > 1) {
-                            error("Error with Terraform configuration:\n${diagnostics.join('\n')}")
-                        }
-
-                        switch (diagnostics[0] as String) {
-                            case upgradeErrors:
-                                terraformVersion = '0.13.5'
-                                echo "Error with Terraform validation, trying Terraform v${terraformVersion}..."
-                                setTerraformVersion(terraformVersion)
-                                break
-                            case passErrors:
-                                echo 'Error with Terraform validation acceptable for Terraform >v0.13. Continuing...'
-                                break
-                            default:
+                            if (diagnostics.size > 1) {
                                 error("Error with Terraform configuration:\n${diagnostics.join('\n')}")
-                                break
-                        }
-                }   
+                            }
+
+                            switch (diagnostics[0] as String) {
+                                case upgradeErrors:
+                                    terraformVersion = '0.13.5'
+                                    echo "Error with Terraform validation, trying Terraform v${terraformVersion}..."
+                                    setTerraformVersion(terraformVersion)
+                                    break
+                                case passErrors:
+                                    echo 'Error with Terraform validation acceptable for Terraform >v0.13. Continuing...'
+                                    break
+                                default:
+                                    error("Error with Terraform configuration:\n${diagnostics.join('\n')}")
+                                    break
+                            }
+                        }   
+                    }
                         // sh """
                         //     rm -rf .terraform 
                         //     terraform init -upgrade=true
