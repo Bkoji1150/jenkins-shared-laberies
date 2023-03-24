@@ -51,8 +51,6 @@ def call() {
                             }
                         }   
                     }
-                    return terraformVersion
-
                 }
             }
         stage('Create Terraform workspace'){
