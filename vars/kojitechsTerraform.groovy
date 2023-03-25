@@ -128,11 +128,10 @@ def call() {
         stage('ansible-test') {
             steps{
                 sh"""
-                echo -e "[defaults]\nlog_path=bootstrap.log\ninterpreter_python=auto_silent\ninventory=host.cfg" > ./ansible/inventory/ansible.cfg
-                cat ./ansible/inventory/ansible.cfg
-                /Library/Frameworks/Python.framework/Versions/3.10/bin/ansible --version
-                /Library/Frameworks/Python.framework/Versions/3.10/bin/ansible-playbook --private-key private-key ./ansible/inventory/ping_playbook.yaml
-                cat ./ansible/inventory/bootstrap.log
+                cd ./ansible/inventory
+                echo -e "[defaults]\nlog_path=bootstrap.log\ninterpreter_python=auto_silent\ninventory=host.cfg" > ansible.cfg
+                /Library/Frameworks/Python.framework/Versions/3.10/bin/ansible-playbook --private-key private-key ping_playbook.yaml
+                cat bootstrap.log
                 """
                 }
             }
