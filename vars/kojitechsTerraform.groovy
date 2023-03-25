@@ -127,9 +127,12 @@ def call() {
         }
         stage('ansible-test') {
             steps{
-                sh """
-                ls -al 
-                /Library/Frameworks/Python.framework/Versions/3.10/bin/ansible-playbook -i ./ansible/inventory/host.cfg --private-key ~/.ssh/id_rsa ./ansible/inventory/ping_playbook.yaml
+                sh"""
+                export /Library/Frameworks/Python.framework/Versions/3.10/bin
+                cd ./ansible/inventory 
+                echo -e "[defaults]\nlog_path=bootstrap.log\ninterpreter_python=auto_silent\ninventory=host.cfg" > ansible.cfg
+                cat  ansible.cfg && cat bootstrap.log
+                ansible-playbook --private-key private-key ping_playbook.yaml
                 """
                 }
             }
@@ -152,7 +155,7 @@ def call() {
         }
         cleanup {
             cleanWs()
-        }
+            }
         }
     }
-}    
+}
