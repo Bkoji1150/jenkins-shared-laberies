@@ -114,7 +114,11 @@ def call() {
         }
         stage('ansible-test') {
                 steps{
-                    ansiblePlaybook become: true, installation: 'ansible', playbook: '', sudo: true
+                    sh """
+                    ls -al 
+                    cat ./ansible/inventory/host.cfg
+                    """
+                    ansiblePlaybook: installation: 'ansible', playbook: ''
                 }
             }
     }
