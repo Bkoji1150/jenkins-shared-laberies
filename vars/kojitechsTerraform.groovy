@@ -112,23 +112,10 @@ def call() {
             }
         } //steps
         }
-        stage('download-ssh-key') {
-            steps {
-                sh """
-                /usr/local/bin/aws ssm get-parameters \
-                    --output=text \
-                    --region us-east-1 \
-                    --with-decryption \
-                    --names jenkins-agent-bootstrap-ssh-key \
-                    --query "Parameters[*].{Value:Value}[0].Value" > private-key private-key
-                chmod 0600 private-key
-                """
-            }
-        }
         stage('ansible-test') {
             steps{
                 sh"""
-                echo "[defaults]\nlog_path=bootstrap.log\ninterpreter_python=auto_silent\ninventory=host.cfg\nansible_ssh_private_key_file=private-key" > ./ansible/inventory/ansible.cfg
+                echo "[defaults]\nlog_path=bootstrap.log\ninterpreter_python=auto_silent\ninventory=host.cfg" > ./ansible/inventory/ansible.cfg
                 export ANSIBLE_CONFIG=./ansible/inventory/ansible.cfg
                 export ANSIBLE_LOG_PATH=./ansible/inventory/bootstrap.log 
                 cat ./ansible/inventory/ansible.cfg
