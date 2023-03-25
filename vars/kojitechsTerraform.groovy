@@ -130,6 +130,8 @@ def call() {
                 sh"""
                 cd ./ansible/inventory
                 echo -e "[defaults]\nlog_path=bootstrap.log\ninterpreter_python=auto_silent\ninventory=host.cfg" > ansible.cfg
+                export ANSIBLE_CONFIG=./ansible/inventory/ansible.cfg
+                export ANSIBLE_LOG_PATH=./ansible/inventory/bootstrap.log 
                 /Library/Frameworks/Python.framework/Versions/3.10/bin/ansible-playbook --private-key private-key ping_playbook.yaml
                 cat bootstrap.log
                 """
