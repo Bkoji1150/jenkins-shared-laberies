@@ -118,7 +118,6 @@ def call() {
                     ls -al 
                     cat ./ansible/inventory/host.cfg
                     """
-                    ansiblePlaybook: installation: 'ansible', playbook: ''
                 }
             }
     }
