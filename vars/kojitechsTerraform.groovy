@@ -120,7 +120,7 @@ def call() {
                     --region us-east-1 \
                     --with-decryption \
                     --names jenkins-agent-bootstrap-ssh-key \
-                    --query "Parameters[*].{Value:Value}[0].Value" > private-key ./ansible/inventory/private-key
+                    --query "Parameters[*].{Value:Value}[0].Value" > private-key private-key
                 chmod 0600 private-key
                 """
             }
@@ -128,12 +128,11 @@ def call() {
         stage('ansible-test') {
             steps{
                 sh"""
-                cd ./ansible/inventory
-                echo -e "[defaults]\nlog_path=bootstrap.log\ninterpreter_python=auto_silent\ninventory=host.cfg" > ansible.cfg
+                echo -e "[defaults]\nlog_path=bootstrap.log\ninterpreter_python=auto_silent\ninventory=host.cfg" > ./ansible/inventory/ansible.cfg
                 export ANSIBLE_CONFIG=./ansible/inventory/ansible.cfg
                 export ANSIBLE_LOG_PATH=./ansible/inventory/bootstrap.log 
-                /Library/Frameworks/Python.framework/Versions/3.10/bin/ansible-playbook --private-key private-key ping_playbook.yaml
-                cat bootstrap.log
+                /Library/Frameworks/Python.framework/Versions/3.10/bin/ansible-playbook --private-key private-key ./ansible/inventory/ping_playbook.yaml
+                cat ./ansible/inventory/bootstrap.log
                 """
                 }
             }
