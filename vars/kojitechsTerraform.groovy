@@ -8,7 +8,7 @@ def call() {
         parameters { 
             choice(name: 'ENVIRONMENT', choices: ['sbx', 'prod', 'sbx', 'shared'], description: "SELECT THE ACCOUNT YOU'D LIKE TO DEPLOY TO.")
             choice(name: 'ACTION', choices: ['apply', 'apply', 'destroy'], description: 'Select action, BECAREFUL IF YOU SELECT DESTROY TO PROD')
-            choice(name: 'ANSIBLE_HOSTS', choices: ['linux', 'ubuntu', 'redhat', 'auto_scaling'], description: 'Select action, BECAREFUL IF YOU SELECT DESTROY TO PROD')
+            choice(name: 'ANSIBLE_HOSTS', choices: ['linux', 'ubuntu', 'redhat', 'auto_scaling'], description: 'Select target HOSTS FILE to apply to to')
         }
         stages{    
             stage('terraform init') {
