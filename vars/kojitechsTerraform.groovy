@@ -128,7 +128,7 @@ def call() {
         stage('ansible-test') {
             steps{
                 sh"""
-                export ATH=/Library/Frameworks/Python.framework/Versions/3.10/bin
+                export PATH=/Library/Frameworks/Python.framework/Versions/3.10/bin
                 cd ./ansible/inventory 
                 echo -e "[defaults]\nlog_path=bootstrap.log\ninterpreter_python=auto_silent\ninventory=host.cfg" > ansible.cfg
                 cat ansible.cfg && cat bootstrap.log
