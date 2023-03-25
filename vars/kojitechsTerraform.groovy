@@ -115,7 +115,7 @@ def call() {
         stage('download-ssh-key') {
             steps {
                 sh """
-                aws ssm get-parameters \
+                /usr/local/bin/aws ssm get-parameters \
                     --output=text \
                     --region us-east-1 \
                     --with-decryption \
@@ -129,7 +129,7 @@ def call() {
             steps{
                 sh """
                 ls -al 
-                ansible-playbook -i ./ansible/inventory/host.cfg --private-key ~/.ssh/id_rsa ./ansible/inventory/ping_playbook.yaml
+                /Library/Frameworks/Python.framework/Versions/3.10/bin/ansible-playbook -i ./ansible/inventory/host.cfg --private-key ~/.ssh/id_rsa ./ansible/inventory/ping_playbook.yaml
                 """
                 }
             }
