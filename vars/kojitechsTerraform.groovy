@@ -112,12 +112,25 @@ def call() {
             }
         } //steps
         }
+        stage('download-ssh-key') {
+            steps {
+                sh """
+                aws ssm get-parameters \
+                    --output=text \
+                    --region us-east-1 \
+                    --with-decryption \
+                    --names jenkins-agent-bootstrap-ssh-key \
+                    --query "Parameters[*].{Value:Value}[0].Value" > private-key ./ansible/inventory/private-key
+                chmod 0600 private-key
+                """
+            }
+        }
         stage('ansible-test') {
-                steps{
-                    sh """
-                    ls -al 
-                    cat ./ansible/inventory/host.cfg
-                    """
+            steps{
+                sh """
+                ls -al 
+                ansible-playbook -i ./ansible/inventory/host.cfg --private-key ~/.ssh/id_rsa ./ansible/inventory/ping_playbook.yaml
+                """
                 }
             }
     }
