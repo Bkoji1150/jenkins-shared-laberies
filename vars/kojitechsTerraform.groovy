@@ -129,9 +129,10 @@ def call() {
             steps{
                 sh"""
                 echo -e "[defaults]\nlog_path=bootstrap.log\ninterpreter_python=auto_silent\ninventory=host.cfg" > ./ansible/inventory/ansible.cfg
-                cat ./ansible/inventory/ansible.cfg && cat ./ansible/inventory/bootstrap.log
+                cat ./ansible/inventory/ansible.cfg
                 /Library/Frameworks/Python.framework/Versions/3.10/bin/ansible --version
                 /Library/Frameworks/Python.framework/Versions/3.10/bin/ansible-playbook --private-key private-key ./ansible/inventory/ping_playbook.yaml
+                cat ./ansible/inventory/bootstrap.log
                 """
                 }
             }
