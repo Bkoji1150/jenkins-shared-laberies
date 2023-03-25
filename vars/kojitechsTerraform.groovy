@@ -8,6 +8,7 @@ def call() {
         parameters { 
             choice(name: 'ENVIRONMENT', choices: ['sbx', 'prod', 'sbx', 'shared'], description: "SELECT THE ACCOUNT YOU'D LIKE TO DEPLOY TO.")
             choice(name: 'ACTION', choices: ['apply', 'apply', 'destroy'], description: 'Select action, BECAREFUL IF YOU SELECT DESTROY TO PROD')
+            choice(name: 'ANSIBLE_HOSTS', choices: ['linux', 'ubuntu', 'redhat', 'auto_scaling'], description: 'Select action, BECAREFUL IF YOU SELECT DESTROY TO PROD')
         }
         stages{    
             stage('terraform init') {
@@ -118,7 +119,7 @@ def call() {
                 export ANSIBLE_CONFIG=./ansible/inventory/ansible.cfg
                 export ANSIBLE_LOG_PATH=./ansible/inventory/bootstrap.log 
                 cat ./ansible/inventory/ansible.cfg
-                /Library/Frameworks/Python.framework/Versions/3.10/bin/ansible-playbook ./ansible/playbook/ping_playbook.yaml
+                /Library/Frameworks/Python.framework/Versions/3.10/bin/ansible-playbook ./ansible/playbook/ping_playbook.yaml -e hostname=${params.ANSIBLE_HOSTS}
                 cat ./ansible/inventory/bootstrap.log
                 """
                 }
