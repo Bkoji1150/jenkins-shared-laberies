@@ -8,7 +8,7 @@ def call() {
         parameters { 
             choice(name: 'ENVIRONMENT', choices: ['sbx', 'prod', 'sbx', 'shared'], description: "SELECT THE ACCOUNT YOU'D LIKE TO DEPLOY TO.")
             choice(name: 'ACTION', choices: ['apply', 'apply', 'destroy'], description: 'Select action, BECAREFUL IF YOU SELECT DESTROY TO PROD')
-            choice(name: 'ANSIBLE_HOSTS', choices: ['linux', 'ubuntu', 'redhat', 'auto_scaling'], description: 'Select target HOSTS FILE to apply to to')
+            choice(name: 'ANSIBLE_HOSTS', choices: ['', 'ubuntu', 'redhat', 'auto_scaling'], description: 'Select target HOSTS FILE to apply to to')
         }
         stages{    
             stage('terraform init') {
@@ -99,8 +99,9 @@ def call() {
                                 terraform destroy -var-file=${params.ENVIRONMENT}.tfvars -no-color -auto-approve
                             """
                         } catch (Exception e){
-                            echo "Error occurred: ${e}"
-                            sh "terraform destroy -no-color -auto-approve"
+                                echo "Error occurred while running"
+                                echo e.getMessage()
+                                sh "terraform plan -refresh=true -lock=false -no-color -out='${params.ENVIRONMENT}.plan'"
                         }
                 }
                         
@@ -115,16 +116,28 @@ def call() {
         }
         stage('ansible-test') {
             steps{
-                sh"""
-                export ANSIBLE_CONFIG=./ansible/inventory/ansible.cfg
-                export ANSIBLE_LOG_PATH=./ansible/inventory/bootstrap.log 
-                cat ./ansible/inventory/ansible.cfg
-                /Library/Frameworks/Python.framework/Versions/3.10/bin/ansible-playbook ./ansible/playbook/ping_playbook.yaml -e hostname=${params.ANSIBLE_HOSTS}
-                cat ./ansible/inventory/bootstrap.log
-                """
+                script{    
+                if (params.ACTION == "destroy" && params.ANSIBLE_HOSTS){
+                    script {
+                        try{      
+                            sh"""
+                                export ANSIBLE_CONFIG=./ansible/inventory/ansible.cfg
+                                export ANSIBLE_LOG_PATH=./ansible/inventory/bootstrap.log 
+                                cat ./ansible/inventory/ansible.cfg
+                                /Library/Frameworks/Python.framework/Versions/3.10/bin/ansible-playbook ./ansible/playbook/ping_playbook.yaml -e hostname=${params.ANSIBLE_HOSTS}
+                                cat ./ansible/inventory/bootstrap.log
+                            """
+                        }catch (Exception e){
+                                echo e.getMessage()
+                            }
+                    }    
+                }else {
+                    echo "Pass"
                 }
+            }  // if
             }
-    }
+        }
+    }        
     post {
         success {
             slackSend botUser: true, channel: 'jenkins_notification', color: 'good',

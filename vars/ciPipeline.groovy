@@ -15,7 +15,6 @@ void call(List dockerBuildArgs=[], List customParams=[], Map dynamicSteps=[:]) {
         ['name': 'CD_BRANCH', 'defaultValue': 'master', 'description': 'Specify the branch to trigger on the corresponding CD Pipeline. This parameter can be ignored if DEPLOY_ENVIRONMENT is left blank.'],
         ['name': 'TESTS_BRANCH', 'defaultValue': 'master', 'description': 'Specify the branch to trigger on the corresponding Test Pipeline. This parameter can be ignored if a Test Pipeline does not exist.'],
     ]
-
     properties([
         parameters ([
             // customParams _must_ come first to override the defaultParams
