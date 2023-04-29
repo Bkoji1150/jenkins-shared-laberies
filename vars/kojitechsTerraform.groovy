@@ -117,7 +117,7 @@ def call() {
         stage('ansible-test') {
             steps{
                 script{    
-                if (params.ACTION == "destroy" && params.ANSIBLE_HOSTS){
+                if (params.ACTION == "apply" && params.ANSIBLE_HOSTS){
                     script {
                         try{      
                             sh"""
