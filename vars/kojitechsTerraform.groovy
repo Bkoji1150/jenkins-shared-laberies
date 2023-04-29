@@ -2,9 +2,6 @@ def call() {
 
     pipeline {
         agent any
-        tools {
-            terraform 'terraform'
-        }
         parameters { 
             choice(name: 'ENVIRONMENT', choices: ['sbx', 'prod', 'sbx', 'shared'], description: "SELECT THE ACCOUNT YOU'D LIKE TO DEPLOY TO.")
             choice(name: 'ACTION', choices: ['apply', 'apply', 'destroy'], description: 'Select action, BECAREFUL IF YOU SELECT DESTROY TO PROD')
