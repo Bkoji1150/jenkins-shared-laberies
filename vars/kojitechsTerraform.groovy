@@ -17,37 +17,8 @@ def call() {
                     sh """
                         terraform init
                         terraform get -update
+                        terraform validate -json || true
                     """
-                }
-            }
-            stage('Terraform validation') {
-                steps {   
-                     script {
-                        String validateTerraformOutput = sh(
-                            script: 'terraform validate -json || true',
-                            returnStdout: true
-                        ).trim()
-                        def validateTerraform = readJSON text: validateTerraformOutput
-                        if (!validateTerraform.valid) {
-                            List<String> diagnostics = validateTerraform.diagnostics*.summary.unique()
-                            List<String> upgradeErrors = ['Custom variable validation is experimental']
-                            List<String> passErrors = ['Could not load plugin']
-                            if (diagnostics.size > 1) {
-                                error("Error with Terraform configuration:\n${diagnostics.join('\n')}")
-                            }
-                            switch (diagnostics[0] as String) {
-                                case upgradeErrors:
-                                    echo "Error with Terraform validation, trying Terraform v${terraformVersion}..."
-                                    break
-                                case passErrors:
-                                    echo 'Error with Terraform validation acceptable for Terraform >v0.13. Continuing...'
-                                    break
-                                default:
-                                    error("Error with Terraform configuration:\n${diagnostics.join('\n')}")
-                                    break
-                            }
-                        }   
-                    }
                 }
             }
         stage('Create Terraform workspace'){
